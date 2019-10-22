@@ -1,0 +1,62 @@
+/* Enclave.edl - Top EDL file. */
+
+enclave {
+    untrusted {
+        void ocall_print_string([in, string] const char *str);
+    };
+
+    trusted {
+
+        /* command */
+
+        public void ecall_preset_account(
+            [in, size=40] unsigned char *addr,
+            [in, size=64] unsigned char *seckey);
+
+        public void ecall_create_account(
+            [user_check] unsigned char *generated_addr);
+
+        public void ecall_create_channel(
+            unsigned int nonce,
+            [in, size=40] unsigned char *owner,
+            [in, size=40] unsigned char *receiver,
+            unsigned int deposit,
+            [user_check] unsigned char *signed_tx,
+            [user_check] unsigned int *signed_tx_len);
+
+        public void ecall_pay(
+            unsigned int channel_id,
+            unsigned int amount,
+            [user_check] int *is_success);
+
+        public void ecall_get_balance(
+            unsigned int channel_id,
+            [user_check] unsigned int *balance);
+
+        /* event */
+
+        public void ecall_receive_create_channel(
+            unsigned int channel_id,
+            [in, size=40] unsigned char *owner,
+            [in, size=40] unsigned char *receiver,
+            unsigned int deposit);
+
+        /* network */
+
+        public void ecall_go_pre_update(
+            unsigned int payment_num,
+            [user_check] unsigned int *channel_id,
+            [user_check] int *amount,
+            unsigned int size);
+
+        public void ecall_go_post_update(
+            unsigned int payment_num,
+            [user_check] unsigned int *channel_id,
+            [user_check] int *amount,
+            unsigned int size);
+
+        public void ecall_go_idle(
+            unsigned int payment_num);
+
+    };
+};
