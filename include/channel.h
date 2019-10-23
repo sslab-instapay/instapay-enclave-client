@@ -38,7 +38,8 @@ class Channel {
             }
         };
 
-        int pay(unsigned int amount);
+        int pay(unsigned int);
+        int paid(unsigned int);
 
         void transition_to_pre_update();
         void transition_to_post_update();

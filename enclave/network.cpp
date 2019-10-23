@@ -31,6 +31,8 @@ void ecall_go_pre_update(unsigned int payment_num, unsigned int *channel_id, int
 
 void ecall_go_post_update(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size)
 {
+    unsigned int value;
+
     if(payments.find(payment_num) == payments.end()) {
         payments.insert(map_payment_value(payment_num, Payment(payment_num)));
         for(int i = 0; i < size; i++)
@@ -38,7 +40,11 @@ void ecall_go_post_update(unsigned int payment_num, unsigned int *channel_id, in
     }
 
     for(int i = 0; i < size; i++) {
-        channels.find(channel_id[i])->second.pay(amount[i]);
+        value = (amount[i] < 0) ? amount[i] * -1 : amount[i];
+        if(amount[i] > 0)
+            channels.find(channel_id[i])->second.paid(value);
+        else
+            channels.find(channel_id[i])->second.pay(value);
         channels.find(channel_id[i])->second.transition_to_post_update();
     }
 

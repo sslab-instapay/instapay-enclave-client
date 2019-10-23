@@ -153,11 +153,6 @@ int SGX_CDECL main(int argc, char *argv[])
     (void)(argc);
     (void)(argv);
 
-    unsigned int nonce = 0;
-    unsigned char *owner = (unsigned char*)"D03A2CC08755eC7D75887f0997195654b928893e";
-    unsigned char *receiver = (unsigned char*)"0b4161ad4f49781a821c308d672e6c669139843c";
-    unsigned int deposit = 8;
-
     /* Initialize the enclave */
     if(initialize_enclave() < 0) {
         printf("Enter a character before exit ...\n");
@@ -165,10 +160,37 @@ int SGX_CDECL main(int argc, char *argv[])
         return -1;
     }
 
+    /* =============== test =============== */
+
+    unsigned int nonce = 0;
+    unsigned char *A = (unsigned char*)"78902c58006916201F65f52f7834e467877f0500";
+    unsigned char *owner = (unsigned char*)"D03A2CC08755eC7D75887f0997195654b928893e";
+    unsigned char *B = (unsigned char*)"0b4161ad4f49781a821c308d672e6c669139843c";
+    unsigned int deposit = 8;
+
     // std::string signed_tx = ecall_new_channel(nonce, owner, receiver, deposit);
     ecall_register_account(owner, (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd"); // preset account
-    ecall_event_create_channel(2, owner, receiver, 8);
-    printf("BALANCE: %d\n", ecall_get_my_balance(2));
+
+    /*
+                     id: 2                   id: 3
+        A(0x7890...) -----> owner(0xd03a...) -----> B(0x0b41...)
+    */
+    ecall_event_create_channel(2, A, owner, 5);
+    ecall_event_create_channel(3, owner, B, 9);
+    printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", ecall_get_my_balance(2));
+    printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", ecall_get_my_balance(3));
+
+    unsigned int channel_id[2] = {2, 3};
+    int amount[2] = {4, -4};
+
+    ecall_receive_agreement_request(10, channel_id, amount, 2);
+    ecall_receive_update_request(10, channel_id, amount, 2);
+    ecall_receive_payment_confirmation(10);
+
+    printf("[AFTER] CHANNEL 2 BALANCE: %d\n", ecall_get_my_balance(2));
+    printf("[AFTER] CHANNEL 3 BALANCE: %d\n", ecall_get_my_balance(3));
+
+    /* =============== test =============== */
 
     /* Destroy the enclave */
     sgx_destroy_enclave(global_eid);

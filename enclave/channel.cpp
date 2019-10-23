@@ -1,13 +1,24 @@
 #include <channel.h>
 #include <transaction.h>
+#include "sgx_trts.h"
+#include "enclave.h"
+#include "enclave_t.h"
 
 
 int Channel::pay(unsigned int amount)
 {
-    if(m_balance - m_locked_balance < amount)
+    if(m_balance - m_locked_balance < amount) {
         return false;
+    }
 
     m_balance -= amount;
+    return true;
+}
+
+
+int Channel::paid(unsigned int amount)
+{
+    m_balance += amount;
     return true;
 }
 
