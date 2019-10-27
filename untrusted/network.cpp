@@ -1,10 +1,5 @@
-#include <string>
-
 #include "app.h"
 #include "enclave_u.h"
-
-
-using namespace std;
 
 
 void ecall_receive_agreement_request(unsigned int payment_num, void *channel_id, void *amount, unsigned int size)

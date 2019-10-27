@@ -1,10 +1,5 @@
-#include <string>
-
 #include "app.h"
 #include "enclave_u.h"
-
-
-using namespace std;
 
 
 void ecall_register_account(unsigned char *addr, unsigned char *seckey)
@@ -13,14 +8,17 @@ void ecall_register_account(unsigned char *addr, unsigned char *seckey)
 }
 
 
-std::string ecall_new_channel(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit)
+unsigned char* ecall_new_channel(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len)
 {
     unsigned char *signed_tx = new unsigned char[700];
     unsigned int signed_tx_len;
 
     ecall_create_channel(global_eid, nonce, owner, receiver, deposit, signed_tx, &signed_tx_len);
 
-    return std::string(signed_tx, signed_tx + signed_tx_len);
+    *sig_len = signed_tx_len;
+    return signed_tx;
+
+    //return std::string(signed_tx, signed_tx + signed_tx_len);
 }
 
 

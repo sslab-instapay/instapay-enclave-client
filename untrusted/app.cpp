@@ -144,9 +144,6 @@ void ocall_print_string(const char *str)
     printf("%s", str);
 }
 
-#include <string>
-using namespace std;
-
 /* Application entry */
 int SGX_CDECL main(int argc, char *argv[])
 {

@@ -147,7 +147,7 @@ target:  $(App_Name) $(Enclave_Name)
 
 
 else
-target: $(App_Name) $(Signed_Enclave_Name)
+target: $(App_Name) $(Signed_Enclave_Name) libtee.so
 ifeq ($(Build_Mode), HW_DEBUG)
 	@echo "The project has been built in debug hardware mode."
 else ifeq ($(Build_Mode), SIM_DEBUG)
@@ -220,7 +220,13 @@ $(Signed_Enclave_Name): $(Enclave_Name)
 	@$(SGX_ENCLAVE_SIGNER) sign -key enclave/enclave_private.pem -enclave $(Enclave_Name) -out $@ -config $(Enclave_Config_File)
 	@echo "SIGN =>  $@"
 
+######## Shared Library ########
+
+libtee.so: untrusted/enclave_u.o $(App_Cpp_Objects)
+	$(CXX) -shared $^ -o $@ $(App_Link_Flags)
+
 .PHONY: clean
 
 clean:
-	@rm -f .config_* $(App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(App_Cpp_Objects) untrusted/enclave_u.* $(Enclave_Cpp_Objects) enclave/enclave_t.*
+	@rm -f .config_* $(App_Name) $(Enclave_Name) $(Signed_Enclave_Name) $(App_Cpp_Objects) untrusted/enclave_u.* $(Enclave_Cpp_Objects) enclave/enclave_t.* libtee.so
+
