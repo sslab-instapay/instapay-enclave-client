@@ -55,6 +55,7 @@ void ecall_go_post_update(unsigned int payment_num, unsigned int *channel_id, in
 void ecall_go_idle(unsigned int payment_num)
 {
     std::vector<Related> c = payments.find(payment_num)->second.m_related_channels;
+    
     for(int i = 0; i < c.size(); i++)
         channels.find(c.at(i).channel_id)->second.transition_to_idle();
 

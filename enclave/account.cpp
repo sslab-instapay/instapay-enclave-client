@@ -1,7 +1,3 @@
-#include <stdint.h>
-#include <cstring>
-#include "enclave.h"
-#include "enclave_t.h"
 #include <account.h>
 
 

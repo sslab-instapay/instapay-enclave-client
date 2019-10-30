@@ -1,8 +1,4 @@
 #include <channel.h>
-#include <transaction.h>
-#include "sgx_trts.h"
-#include "enclave.h"
-#include "enclave_t.h"
 
 
 int Channel::pay(unsigned int amount)

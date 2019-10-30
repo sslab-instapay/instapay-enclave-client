@@ -29,17 +29,17 @@ extern "C" {
 int initialize_enclave(void);
 
 /* command.cpp */
-void ecall_register_account(unsigned char *, unsigned char *);
-unsigned char* ecall_new_channel(unsigned int, unsigned char *, unsigned char *, unsigned int, unsigned int *);
-int ecall_get_my_balance(unsigned int);
+void ecall_preset_account_w(unsigned char *addr, unsigned char *seckey);
+unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len);
+int ecall_get_balance_w(unsigned int channel_id);
 
 /* network.cpp */
-void ecall_receive_agreement_request(unsigned int, unsigned int *, int *, unsigned int);
-void ecall_receive_update_request(unsigned int, unsigned int *, int *, unsigned int);
-void ecall_receive_payment_confirmation(unsigned int);
+void ecall_go_pre_update_w(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size);
+void ecall_go_post_update_w(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size);
+void ecall_go_idle_w(unsigned int payment_num);
 
 /* event.cpp */
-void ecall_event_create_channel(unsigned int, unsigned char *, unsigned char *, unsigned int);
+void ecall_receive_create_channel_w(unsigned int channel_id, unsigned char *owner, unsigned char *receiver, unsigned int deposit);
 
 #if defined(__cplusplus)
 }

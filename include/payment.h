@@ -25,12 +25,10 @@ class Payment {
 
         std::vector<Related> m_related_channels;
         
-        void add_element(unsigned int, int);
+        void add_element(unsigned int channel_id, int amount);
 
     private:
         unsigned int m_payment_num;
-        
-        // payment_status m_status;
 };
 
 typedef std::map<unsigned int, Payment> map_payment;

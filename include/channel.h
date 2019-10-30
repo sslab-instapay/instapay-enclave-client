@@ -38,14 +38,14 @@ class Channel {
             }
         };
 
-        int pay(unsigned int);
-        int paid(unsigned int);
+        int pay(unsigned int amount);
+        int paid(unsigned int amount);
 
-        void transition_to_pre_update();
-        void transition_to_post_update();
-        void transition_to_idle();
+        void transition_to_pre_update(void);
+        void transition_to_post_update(void);
+        void transition_to_idle(void);
 
-        unsigned int get_balance();
+        unsigned int get_balance(void);
 
     private:
         unsigned int m_id;

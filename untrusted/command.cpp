@@ -2,13 +2,13 @@
 #include "enclave_u.h"
 
 
-void ecall_register_account(unsigned char *addr, unsigned char *seckey)
+void ecall_preset_account_w(unsigned char *addr, unsigned char *seckey)
 {
     ecall_preset_account(global_eid, addr, seckey);
 }
 
 
-unsigned char* ecall_new_channel(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len)
+unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len)
 {
     unsigned char *signed_tx = new unsigned char[700];
     unsigned int signed_tx_len;
@@ -20,7 +20,7 @@ unsigned char* ecall_new_channel(unsigned int nonce, unsigned char *owner, unsig
 }
 
 
-int ecall_get_my_balance(unsigned int channel_id)
+int ecall_get_balance_w(unsigned int channel_id)
 {
     unsigned int balance;
 

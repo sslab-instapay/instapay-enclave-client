@@ -39,10 +39,9 @@ class Transaction {
         };
 
         std::vector<unsigned char> signed_tx;
-        // bool is_signed;
 
-        std::vector<unsigned char> encode(bool);
-        void sign(unsigned char*);
+        std::vector<unsigned char> encode(bool is_signed);
+        void sign(unsigned char *seckey_arr);
         
     private:
         unsigned int m_nonce;

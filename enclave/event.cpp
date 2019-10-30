@@ -2,13 +2,11 @@
 #include <stdint.h>
 #include <cstring>
 
-#include "sgx_trts.h"
 #include "enclave.h"
 #include "enclave_t.h"
 
 #include <account.h>
 #include <channel.h>
-#include <transaction.h>
 #include <util.h>
 
 
@@ -27,12 +25,10 @@ void ecall_receive_create_channel(unsigned int channel_id, unsigned char *owner,
 
     bool is_in;
 
-    if(accounts.find(owner_addr) != accounts.end()) {
+    if(accounts.find(owner_addr) != accounts.end())
         is_in = false;
-    }
-    else {
+    else
         is_in = true;
-    }
 
     Channel channel(channel_id, owner, receiver, is_in, deposit);
     channels.insert(map_channel_value(channel_id, channel));

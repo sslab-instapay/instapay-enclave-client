@@ -166,26 +166,26 @@ int SGX_CDECL main(int argc, char *argv[])
     unsigned int deposit = 8;
 
     // std::string signed_tx = ecall_new_channel(nonce, owner, receiver, deposit);
-    ecall_register_account(owner, (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd"); // preset account
+    ecall_preset_account_w(owner, (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd"); // preset account
 
     /*
                      id: 2                   id: 3
         A(0x7890...) -----> owner(0xd03a...) -----> B(0x0b41...)
     */
-    ecall_event_create_channel(2, A, owner, 5);
-    ecall_event_create_channel(3, owner, B, 9);
-    printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", ecall_get_my_balance(2));
-    printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", ecall_get_my_balance(3));
+    ecall_receive_create_channel_w(2, A, owner, 5);
+    ecall_receive_create_channel_w(3, owner, B, 9);
+    printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", ecall_get_balance_w(2));
+    printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", ecall_get_balance_w(3));
 
     unsigned int channel_id[2] = {2, 3};
     int amount[2] = {4, -4};
 
-    ecall_receive_agreement_request(10, channel_id, amount, 2);
-    ecall_receive_update_request(10, channel_id, amount, 2);
-    ecall_receive_payment_confirmation(10);
+    ecall_go_pre_update_w(10, channel_id, amount, 2);
+    ecall_go_post_update_w(10, channel_id, amount, 2);
+    ecall_go_idle_w(10);
 
-    printf("[AFTER] CHANNEL 2 BALANCE: %d\n", ecall_get_my_balance(2));
-    printf("[AFTER] CHANNEL 3 BALANCE: %d\n", ecall_get_my_balance(3));
+    printf("[AFTER] CHANNEL 2 BALANCE: %d\n", ecall_get_balance_w(2));
+    printf("[AFTER] CHANNEL 3 BALANCE: %d\n", ecall_get_balance_w(3));
 
     /* =============== test =============== */
 
