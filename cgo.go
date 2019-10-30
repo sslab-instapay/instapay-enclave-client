@@ -53,16 +53,17 @@ func main() {
 	A := []C.uchar("78902c58006916201F65f52f7834e467877f0500")
 	B := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
 	deposit = C.uint(5)
-	C.ecall_event_create_channel(channel_id, unsafe.Pointer(&A[0]), unsafe.Pointer(&owner[0]), deposit)
+	C.ecall_event_create_channel(channel_id, &A[0], &owner[0], deposit)
 
 	channel_id = C.uint(3)
 	deposit = C.uint(9)
-	C.ecall_event_create_channel(channel_id, unsafe.Pointer(&owner[0]), unsafe.Pointer(&B[0]), deposit)
+	C.ecall_event_create_channel(channel_id, &owner[0], &B[0], deposit)
 
 
 	/* check balance */
 	fmt.Printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(2)))
 	fmt.Printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(3)))
+	fmt.Println()
 
 
 	/* calling ecall_receive_agreement_request */
@@ -70,18 +71,25 @@ func main() {
 	channel_ids := []C.uint{2, 3}
 	amount := []C.int{4, -4}
 	size := C.uint(2)
-    C.ecall_receive_agreement_request(payment_num, unsafe.Pointer(&channel_ids[0]), unsafe.Pointer(&amount[0]), size);
+    C.ecall_receive_agreement_request(payment_num, &channel_ids[0], &amount[0], size);
+
+	fmt.Printf("[PRE-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(2)))
+	fmt.Printf("[PRE-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(3)))
+	fmt.Println()
 
 
 	/* calling ecall_receive_update_request */
-	C.ecall_receive_update_request(payment_num, unsafe.Pointer(&channel_ids[0]), unsafe.Pointer(&amount[0]), size);
+	C.ecall_receive_update_request(payment_num, &channel_ids[0], &amount[0], size);
+
+	fmt.Printf("[POST-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(2)))
+	fmt.Printf("[POST-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(3)))
+	fmt.Println()
 
 
 	/* calling ecall_receive_payment_confirmation */
 	C.ecall_receive_payment_confirmation(10);
 
-
 	/* check balance */
-	fmt.Printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(2)))
-	fmt.Printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(3)))	
+	fmt.Printf("[AFTER] CHANNEL 2 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(2)))
+	fmt.Printf("[AFTER] CHANNEL 3 BALANCE: %d\n", C.ecall_get_my_balance(C.uint(3)))
 }

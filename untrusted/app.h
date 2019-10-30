@@ -30,16 +30,16 @@ int initialize_enclave(void);
 
 /* command.cpp */
 void ecall_register_account(unsigned char *, unsigned char *);
-unsigned char* ecall_new_channel(unsigned int, unsigned char*, unsigned char*, unsigned int, unsigned int*);
+unsigned char* ecall_new_channel(unsigned int, unsigned char *, unsigned char *, unsigned int, unsigned int *);
 int ecall_get_my_balance(unsigned int);
 
 /* network.cpp */
-void ecall_receive_agreement_request(unsigned int, void *, void *, unsigned int);
-void ecall_receive_update_request(unsigned int, void *, void *, unsigned int);
+void ecall_receive_agreement_request(unsigned int, unsigned int *, int *, unsigned int);
+void ecall_receive_update_request(unsigned int, unsigned int *, int *, unsigned int);
 void ecall_receive_payment_confirmation(unsigned int);
 
 /* event.cpp */
-void ecall_event_create_channel(unsigned int, void *, void *, unsigned int);
+void ecall_event_create_channel(unsigned int, unsigned char *, unsigned char *, unsigned int);
 
 #if defined(__cplusplus)
 }

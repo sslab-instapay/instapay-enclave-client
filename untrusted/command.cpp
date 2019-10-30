@@ -14,11 +14,9 @@ unsigned char* ecall_new_channel(unsigned int nonce, unsigned char *owner, unsig
     unsigned int signed_tx_len;
 
     ecall_create_channel(global_eid, nonce, owner, receiver, deposit, signed_tx, &signed_tx_len);
-
     *sig_len = signed_tx_len;
+    
     return signed_tx;
-
-    //return std::string(signed_tx, signed_tx + signed_tx_len);
 }
 
 
