@@ -8,6 +8,16 @@ void ecall_preset_account_w(unsigned char *addr, unsigned char *seckey)
 }
 
 
+unsigned char* ecall_create_account_w(void)
+{
+    unsigned char *generated_addr = new unsigned char[20];
+
+    ecall_create_account(global_eid, generated_addr);
+
+    return generated_addr;
+}
+
+
 unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len)
 {
     unsigned char *signed_tx = new unsigned char[700];

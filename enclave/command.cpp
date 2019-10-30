@@ -65,6 +65,8 @@ void ecall_create_account(unsigned char *generated_addr)
     std::vector<unsigned char> s(seckey, seckey + 32);
     accounts.insert(map_account_value(p, Account(s)));
 
+    copy(msg32 + 20, msg32 + 32, generated_addr);
+
     return;
 }
 
