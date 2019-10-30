@@ -44,6 +44,21 @@ func main() {
 	fmt.Println()
 
 
+	/* calling ecall_create_account_w */
+	var sig1 *C.uchar = C.ecall_create_account_w()
+	hdr1 := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(sig1)),
+		Len:  20,
+		Cap:  20,
+	}
+
+	s1 := *(*[]C.uchar)(unsafe.Pointer(&hdr1))
+	for i := C.uint(0); i < 20; i++ {
+        fmt.Printf("%02x", s1[i])
+	}
+	fmt.Println()
+
+
 	/* calling ecall_receive_create_channel_w */
     /*
                      id: 2                   id: 3

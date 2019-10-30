@@ -61,11 +61,11 @@ void ecall_create_account(unsigned char *generated_addr)
     sha3_Update(&sha3_ctx, output + 1, outputlen-1);
     msg32 = (unsigned char*)sha3_Finalize(&sha3_ctx);
 
-    std::vector<unsigned char> p(msg32 + 20, msg32 + 32);
+    std::vector<unsigned char> p(msg32 + 12, msg32 + 32);
     std::vector<unsigned char> s(seckey, seckey + 32);
     accounts.insert(map_account_value(p, Account(s)));
 
-    copy(msg32 + 20, msg32 + 32, generated_addr);
+    copy(msg32 + 12, msg32 + 32, generated_addr);
 
     return;
 }
