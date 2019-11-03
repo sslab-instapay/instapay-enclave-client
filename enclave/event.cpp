@@ -23,15 +23,14 @@ void ecall_receive_create_channel(unsigned int channel_id, unsigned char *owner,
     if(accounts.find(owner_addr) == accounts.end() && accounts.find(receiver_addr) == accounts.end())
         return;
 
-    bool is_in;
+    Channel *channel;
 
     if(accounts.find(owner_addr) != accounts.end())
-        is_in = false;
+        channel = new Channel(channel_id, owner, receiver, false, deposit);
     else
-        is_in = true;
+        channel = new Channel(channel_id, receiver, owner, true, deposit);
 
-    Channel channel(channel_id, owner, receiver, is_in, deposit);
-    channels.insert(map_channel_value(channel_id, channel));
+    channels.insert(map_channel_value(channel_id, *channel));
 
     return;
 }

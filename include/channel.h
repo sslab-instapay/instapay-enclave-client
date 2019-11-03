@@ -13,26 +13,30 @@ enum channel_status {
 
 class Channel {
     public:
+        Channel() {};
         Channel(unsigned int t_id,
-                unsigned char *t_from,
-                unsigned char *t_to,
+                unsigned char *t_my_addr,
+                unsigned char *t_other_addr,
                 bool t_is_in,
                 unsigned int t_deposit
                 )
                 : m_id(t_id)
                 , m_is_in(t_is_in)
         {
-            m_to = ::arr_to_bytes(t_to, 40);
-            m_from = ::arr_to_bytes(t_from, 40);
+            m_my_addr = ::arr_to_bytes(t_my_addr, 40);
+            m_other_addr = ::arr_to_bytes(t_other_addr, 40);
 
             m_status = (m_id == -1) ? PENDING:IDLE;
 
             if(m_is_in == true) {
-                m_deposit = 0;
+                m_my_deposit = 0;
+                m_other_deposit = t_deposit;
                 m_balance = 0;
+                m_locked_balance = 0;
             }
             else {
-                m_deposit = t_deposit;
+                m_my_deposit = t_deposit;
+                m_other_deposit = 0;
                 m_balance = t_deposit;
                 m_locked_balance = 0;
             }
@@ -47,15 +51,16 @@ class Channel {
 
         unsigned int get_balance(void);
 
-    private:
+
         unsigned int m_id;
-        unsigned char *m_from;
-        unsigned char *m_to;
         bool m_is_in;
         channel_status m_status;
-        unsigned int m_deposit;
+        unsigned char *m_my_addr;
+        unsigned int m_my_deposit;
+        unsigned int m_other_deposit;
         unsigned int m_balance;
         unsigned int m_locked_balance;
+        unsigned char *m_other_addr;
         unsigned char *m_other_ip;
         unsigned int m_other_port;
 };

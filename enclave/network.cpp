@@ -23,6 +23,7 @@ void ecall_go_pre_update(unsigned int payment_num, unsigned int *channel_id, int
     for(int i = 0; i < size; i++) {
         payments.find(payment_num)->second.add_element(channel_id[i], amount[i]);
         channels.find(channel_id[i])->second.transition_to_pre_update();
+        channels.find(channel_id[i])->second.m_locked_balance -= amount[i];
     }
 
     return;
@@ -45,6 +46,7 @@ void ecall_go_post_update(unsigned int payment_num, unsigned int *channel_id, in
             channels.find(channel_id[i])->second.paid(value);
         else
             channels.find(channel_id[i])->second.pay(value);
+        channels.find(channel_id[i])->second.m_locked_balance += amount[i];
         channels.find(channel_id[i])->second.transition_to_post_update();
     }
 
@@ -60,4 +62,11 @@ void ecall_go_idle(unsigned int payment_num)
         channels.find(c.at(i).channel_id)->second.transition_to_idle();
 
     return;
+}
+
+
+void ecall_register_comminfo(unsigned int channel_id, unsigned char *ip, unsigned int ip_size, unsigned int port)
+{
+    channels.find(channel_id)->second.m_other_ip = ::copy_bytes(ip, ip_size);
+    channels.find(channel_id)->second.m_other_port = port;
 }

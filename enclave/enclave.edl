@@ -58,5 +58,38 @@ enclave {
         public void ecall_go_idle(
             unsigned int payment_num);
 
+        public void ecall_register_comminfo(
+            unsigned int channel_id,
+            [user_check] unsigned char *ip,
+            unsigned int ip_size,
+            unsigned int port);
+
+        /* load */
+        
+        public void ecall_load_account_data(
+            [in, size=40] unsigned char *addr,
+            [in, size=64] unsigned char *seckey);
+
+        public void ecall_load_channel_data(
+            unsigned int channel_id,
+            unsigned int type,
+            unsigned int channel_status,
+            [in, size=40] unsigned char *my_addr,
+            unsigned int my_deposit,
+            unsigned int other_deposit,
+            unsigned int balance,
+            unsigned int locked_balance,
+            [in, size=40] unsigned char *other_addr,
+            [user_check] unsigned char *other_ip,
+            unsigned int ip_size,
+            unsigned int other_port);
+
+        public void ecall_load_payment_data(
+            unsigned int payment_num,
+            unsigned int channel_id,
+            int amount);
+
+        /* store */
+
     };
 };
