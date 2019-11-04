@@ -114,4 +114,23 @@ func main() {
 
 	fmt.Printf("[AFTER] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
 	fmt.Printf("[AFTER] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
+
+
+	/* 
+		loading channel information from database
+	*/
+	ChannelID := C.uint(9)
+	IsIn := C.uint(0)
+	ChannelStatus := C.uint(0)
+	MyAddr := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
+	MyDeposit := C.uint(88)
+	OtherDeposit := C.uint(0)
+	Balance := C.uint(80)
+	LockedBalance := C.uint(0)
+	OtherAddr := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
+	OtherIP := []C.uchar("123.12.1.2")
+	OtherPort := C.uint(7889)
+
+    C.ecall_load_channel_data_w(ChannelID, IsIn, ChannelStatus, &MyAddr[0], MyDeposit, OtherDeposit, Balance, LockedBalance, &OtherAddr[0], &OtherIP[0], OtherPort);
+    fmt.Printf("\nCHANNEL 9 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(9)))
 }
