@@ -103,6 +103,23 @@ void ecall_create_channel(unsigned int nonce, unsigned char *owner, unsigned cha
     return;
 }
 
+void ecall_onchain_payment(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int amount, unsigned char *signed_tx, unsigned int *signed_tx_len)
+{
+    /* encode ABI for calling "create_channel(address)" on the contract */
+    sha3_context sha3_ctx;
+
+    /* generate a transaction creating a channel */
+    Transaction tx(nonce, receiver, amount, null, 0);
+
+    // TODO: find the account's private key and sign on transaction using
+    tx.sign((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd");
+
+    memcpy(signed_tx, tx.signed_tx.data(), tx.signed_tx.size());
+    *signed_tx_len = tx.signed_tx.size();
+
+    return;
+}
+
 
 void ecall_pay(unsigned int channel_id, unsigned int amount, int *is_success)
 {
