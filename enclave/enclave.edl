@@ -24,6 +24,14 @@ enclave {
             [user_check] unsigned char *signed_tx,
             [user_check] unsigned int *signed_tx_len);
 
+        public void ecall_onchain_payment(
+            unsigned int nonce,
+            [in, size=40] unsigned char *owner,
+            [in, size=40] unsigned char *receiver,
+            unsigned int amount,
+            [user_check] unsigned char *signed_tx,
+            [user_check] unsigned int *signed_tx_len);    
+
         public void ecall_pay(
             unsigned int channel_id,
             unsigned int amount,
