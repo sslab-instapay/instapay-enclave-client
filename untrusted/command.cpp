@@ -38,3 +38,27 @@ int ecall_get_balance_w(unsigned int channel_id)
 
     return balance;
 }
+
+
+unsigned char* ecall_close_channel_w(unsigned int nonce, unsigned int channel_id, unsigned int *sig_len)
+{
+    unsigned char *signed_tx = new unsigned char[700];
+    unsigned int signed_tx_len;
+
+    ecall_close_channel(global_eid, nonce, channel_id, signed_tx, &signed_tx_len);
+    *sig_len = signed_tx_len;
+    
+    return signed_tx;
+}
+
+
+unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *sig_len)
+{
+    unsigned char *signed_tx = new unsigned char[700];
+    unsigned int signed_tx_len;
+
+    ecall_eject(global_eid, nonce, pn, signed_tx, &signed_tx_len);
+    *sig_len = signed_tx_len;
+    
+    return signed_tx;    
+}
