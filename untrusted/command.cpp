@@ -29,6 +29,16 @@ unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, 
     return signed_tx;
 }
 
+unsigned char* ecall_onchain_payment_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int amount, unsigned int *sig_len)
+{
+    unsigned char *signed_tx = new unsigned char[700];
+    unsigned int signed_tx_len;
+
+    ecall_onchain_payment(global_eid, nonce, owner, receiver, amount, signed_tx, &signed_tx_len);
+    *sig_len = signed_tx_len;
+    
+    return signed_tx;
+}
 
 int ecall_get_balance_w(unsigned int channel_id)
 {

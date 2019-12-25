@@ -17,20 +17,14 @@ import (
 func main() {
 	C.initialize_enclave()
 
-	/* calling ecall_preset_account_w */
-	owner := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
-	key := []C.uchar("e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd")
-	C.ecall_preset_account_w(&owner[0], &key[0])
-
-
-	/* calling ecall_create_channel_w */
+	/* calling ecall_onchain_payment */
 	nonce := C.uint(0)
-	owner = []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
+	owner := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
 	receiver := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
-	deposit := C.uint(8)
+	amount := C.uint(8)
 	SigLen := C.uint(0)
 
-	var sig *C.uchar = C.ecall_create_channel_w(nonce, &owner[0], &receiver[0], deposit, &SigLen)
+	var sig *C.uchar = C.ecall_onchain_payment_w(nonce, &owner[0], &receiver[0], amount, &SigLen)
 	hdr := reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(sig)),
 		Len:  int(SigLen),
@@ -43,113 +37,138 @@ func main() {
 	}
 	fmt.Println()
 
+	// /* calling ecall_preset_account_w */
+	// owner := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
+	// key := []C.uchar("e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd")
+	// C.ecall_preset_account_w(&owner[0], &key[0])
 
-	/* calling ecall_create_account_w */
-	var sig1 *C.uchar = C.ecall_create_account_w()
-	hdr1 := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(sig1)),
-		Len:  20,
-		Cap:  20,
-	}
+	/* calling ecall_create_channel_w */
+	// nonce := C.uint(0)
+	// owner := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
+	// receiver := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
+	// deposit := C.uint(8)
+	// SigLen := C.uint(0)
 
-	s1 := *(*[]C.uchar)(unsafe.Pointer(&hdr1))
-	for i := C.uint(0); i < 20; i++ {
-        fmt.Printf("%02x", s1[i])
-	}
-	fmt.Println()
+	// var sig *C.uchar = C.ecall_create_channel_w(nonce, &owner[0], &receiver[0], deposit, &SigLen)
+	// hdr := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(sig)),
+	// 	Len:  int(SigLen),
+	// 	Cap:  int(SigLen),
+	// }
 
-
-	/* calling ecall_receive_create_channel_w */
-    /*
-                     id: 2                   id: 3
-        A(0x7890...) -----> owner(0xd03a...) -----> B(0x0b41...)
-    */	
-	channel_id := C.uint(2)
-	A := []C.uchar("78902c58006916201F65f52f7834e467877f0500")
-	B := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
-	deposit = C.uint(5)
-	C.ecall_receive_create_channel_w(channel_id, &A[0], &owner[0], deposit)
-
-	channel_id = C.uint(3)
-	deposit = C.uint(9)
-	C.ecall_receive_create_channel_w(channel_id, &owner[0], &B[0], deposit)
+	// s := *(*[]C.uchar)(unsafe.Pointer(&hdr))
+	// for i := C.uint(0); i < SigLen; i++ {
+    //     fmt.Printf("%02x", s[i])
+	// }
+	// fmt.Println()
 
 
-	fmt.Printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
-	fmt.Printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
-	fmt.Println()
+	// /* calling ecall_create_account_w */
+	// var sig1 *C.uchar = C.ecall_create_account_w()
+	// hdr1 := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(sig1)),
+	// 	Len:  20,
+	// 	Cap:  20,
+	// }
+
+	// s1 := *(*[]C.uchar)(unsafe.Pointer(&hdr1))
+	// for i := C.uint(0); i < 20; i++ {
+    //     fmt.Printf("%02x", s1[i])
+	// }
+	// fmt.Println()
 
 
-	/*
-		calling ecall_go_pre_update_w
-		received agreement request
-	*/
-	payment_num := C.uint(30)
-	channel_ids := []C.uint{2, 3}
-	amount := []C.int{4, -4}
-	size := C.uint(2)
-	C.ecall_go_pre_update_w(payment_num, &channel_ids[0], &amount[0], size);
+	// /* calling ecall_receive_create_channel_w */
+    // /*
+    //                  id: 2                   id: 3
+    //     A(0x7890...) -----> owner(0xd03a...) -----> B(0x0b41...)
+    // */	
+	// channel_id := C.uint(2)
+	// A := []C.uchar("78902c58006916201F65f52f7834e467877f0500")
+	// B := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
+	// deposit = C.uint(5)
+	// C.ecall_receive_create_channel_w(channel_id, &A[0], &owner[0], deposit)
 
-	fmt.Printf("[PRE-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
-	fmt.Printf("[PRE-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
-	fmt.Println()
-
-
-	/* 
-		calling ecall_go_post_update_w
-		received update request
-	*/
-	C.ecall_go_post_update_w(payment_num, &channel_ids[0], &amount[0], size);
-
-	fmt.Printf("[POST-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
-	fmt.Printf("[POST-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
-	fmt.Println()
+	// channel_id = C.uint(3)
+	// deposit = C.uint(9)
+	// C.ecall_receive_create_channel_w(channel_id, &owner[0], &B[0], deposit)
 
 
-	/* 
-		calling ecall_go_idle_w
-		received payment confirmation
-	*/
-	C.ecall_go_idle_w(10);
-
-	fmt.Printf("[AFTER] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
-	fmt.Printf("[AFTER] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
+	// fmt.Printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
+	// fmt.Printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
+	// fmt.Println()
 
 
-	/* 
-		loading channel information from database
-	*/
-	ChannelID := C.uint(9)
-	IsIn := C.uint(0)
-	ChannelStatus := C.uint(0)
-	MyAddr := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
-	MyDeposit := C.uint(88)
-	OtherDeposit := C.uint(0)
-	Balance := C.uint(80)
-	LockedBalance := C.uint(0)
-	OtherAddr := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
-	OtherIP := []C.uchar("123.12.1.2")
-	OtherPort := C.uint(7889)
+	// /*
+	// 	calling ecall_go_pre_update_w
+	// 	received agreement request
+	// */
+	// payment_num := C.uint(30)
+	// channel_ids := []C.uint{2, 3}
+	// amount := []C.int{4, -4}
+	// size := C.uint(2)
+	// C.ecall_go_pre_update_w(payment_num, &channel_ids[0], &amount[0], size);
 
-    C.ecall_load_channel_data_w(ChannelID, IsIn, ChannelStatus, &MyAddr[0], MyDeposit, OtherDeposit, Balance, LockedBalance, &OtherAddr[0], &OtherIP[0], OtherPort);
-	fmt.Printf("\nCHANNEL 9 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(9)))
+	// fmt.Printf("[PRE-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
+	// fmt.Printf("[PRE-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
+	// fmt.Println()
+
+
+	// /* 
+	// 	calling ecall_go_post_update_w
+	// 	received update request
+	// */
+	// C.ecall_go_post_update_w(payment_num, &channel_ids[0], &amount[0], size);
+
+	// fmt.Printf("[POST-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
+	// fmt.Printf("[POST-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
+	// fmt.Println()
+
+
+	// /* 
+	// 	calling ecall_go_idle_w
+	// 	received payment confirmation
+	// */
+	// C.ecall_go_idle_w(10);
+
+	// fmt.Printf("[AFTER] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
+	// fmt.Printf("[AFTER] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
+
+
+	// /* 
+	// 	loading channel information from database
+	// */
+	// ChannelID := C.uint(9)
+	// IsIn := C.uint(0)
+	// ChannelStatus := C.uint(0)
+	// MyAddr := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
+	// MyDeposit := C.uint(88)
+	// OtherDeposit := C.uint(0)
+	// Balance := C.uint(80)
+	// LockedBalance := C.uint(0)
+	// OtherAddr := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
+	// OtherIP := []C.uchar("123.12.1.2")
+	// OtherPort := C.uint(7889)
+
+    // C.ecall_load_channel_data_w(ChannelID, IsIn, ChannelStatus, &MyAddr[0], MyDeposit, OtherDeposit, Balance, LockedBalance, &OtherAddr[0], &OtherIP[0], OtherPort);
+	// fmt.Printf("\nCHANNEL 9 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(9)))
 	
 
-	/* calling ecall_close_channel_w */
-	nonce = C.uint(0)
-	ChannelID = C.uint(9)
-	SigLen = C.uint(0)
+	// /* calling ecall_close_channel_w */
+	// nonce = C.uint(0)
+	// ChannelID = C.uint(9)
+	// SigLen = C.uint(0)
 
-	var sig2 *C.uchar = C.ecall_close_channel_w(nonce, ChannelID, &SigLen)
-	hdr2 := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(sig2)),
-		Len:  int(SigLen),
-		Cap:  int(SigLen),
-	}
+	// var sig2 *C.uchar = C.ecall_close_channel_w(nonce, ChannelID, &SigLen)
+	// hdr2 := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(sig2)),
+	// 	Len:  int(SigLen),
+	// 	Cap:  int(SigLen),
+	// }
 
-	s2 := *(*[]C.uchar)(unsafe.Pointer(&hdr2))
-	for i := C.uint(0); i < SigLen; i++ {
-        fmt.Printf("%02x", s2[i])
-	}
-	fmt.Println()
+	// s2 := *(*[]C.uchar)(unsafe.Pointer(&hdr2))
+	// for i := C.uint(0); i < SigLen; i++ {
+    //     fmt.Printf("%02x", s2[i])
+	// }
+	// fmt.Println()
 }

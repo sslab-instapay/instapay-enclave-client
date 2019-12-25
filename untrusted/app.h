@@ -32,6 +32,7 @@ int initialize_enclave(void);
 void ecall_preset_account_w(unsigned char *addr, unsigned char *seckey);
 unsigned char* ecall_create_account_w(void);
 unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len);
+unsigned char* ecall_onchain_payment_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int amount, unsigned int *sig_len);
 int ecall_get_balance_w(unsigned int channel_id);
 unsigned char* ecall_close_channel_w(unsigned int nonce, unsigned int channel_id, unsigned int *sig_len);
 unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *sig_len);

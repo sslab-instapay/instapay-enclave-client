@@ -18,6 +18,7 @@ extern "C" {
 void ecall_preset_account(unsigned char* addr, unsigned char* seckey);
 void ecall_create_account(unsigned char* generated_addr);
 void ecall_create_channel(unsigned int nonce, unsigned char* owner, unsigned char* receiver, unsigned int deposit, unsigned char* signed_tx, unsigned int* signed_tx_len);
+void ecall_onchain_payment(unsigned int nonce, unsigned char* owner, unsigned char* receiver, unsigned int amount, unsigned char* signed_tx, unsigned int* signed_tx_len);
 void ecall_pay(unsigned int channel_id, unsigned int amount, int* is_success);
 void ecall_get_balance(unsigned int channel_id, unsigned int* balance);
 void ecall_close_channel(unsigned int nonce, unsigned int channel_id, unsigned char* signed_tx, unsigned int* signed_tx_len);

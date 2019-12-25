@@ -24,6 +24,7 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_print_string, (const char* str));
 sgx_status_t ecall_preset_account(sgx_enclave_id_t eid, unsigned char* addr, unsigned char* seckey);
 sgx_status_t ecall_create_account(sgx_enclave_id_t eid, unsigned char* generated_addr);
 sgx_status_t ecall_create_channel(sgx_enclave_id_t eid, unsigned int nonce, unsigned char* owner, unsigned char* receiver, unsigned int deposit, unsigned char* signed_tx, unsigned int* signed_tx_len);
+sgx_status_t ecall_onchain_payment(sgx_enclave_id_t eid, unsigned int nonce, unsigned char* owner, unsigned char* receiver, unsigned int amount, unsigned char* signed_tx, unsigned int* signed_tx_len);
 sgx_status_t ecall_pay(sgx_enclave_id_t eid, unsigned int channel_id, unsigned int amount, int* is_success);
 sgx_status_t ecall_get_balance(sgx_enclave_id_t eid, unsigned int channel_id, unsigned int* balance);
 sgx_status_t ecall_close_channel(sgx_enclave_id_t eid, unsigned int nonce, unsigned int channel_id, unsigned char* signed_tx, unsigned int* signed_tx_len);

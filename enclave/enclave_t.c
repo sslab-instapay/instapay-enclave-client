@@ -45,6 +45,15 @@ typedef struct ms_ecall_create_channel_t {
 	unsigned int* ms_signed_tx_len;
 } ms_ecall_create_channel_t;
 
+typedef struct ms_ecall_onchain_payment_t {
+	unsigned int ms_nonce;
+	unsigned char* ms_owner;
+	unsigned char* ms_receiver;
+	unsigned int ms_amount;
+	unsigned char* ms_signed_tx;
+	unsigned int* ms_signed_tx_len;
+} ms_ecall_onchain_payment_t;
+
 typedef struct ms_ecall_pay_t {
 	unsigned int ms_channel_id;
 	unsigned int ms_amount;
@@ -284,6 +293,77 @@ static sgx_status_t SGX_CDECL sgx_ecall_create_channel(void* pms)
 	}
 
 	ecall_create_channel(ms->ms_nonce, _in_owner, _in_receiver, ms->ms_deposit, _tmp_signed_tx, _tmp_signed_tx_len);
+
+err:
+	if (_in_owner) free(_in_owner);
+	if (_in_receiver) free(_in_receiver);
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_ecall_onchain_payment(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_ecall_onchain_payment_t));
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+	ms_ecall_onchain_payment_t* ms = SGX_CAST(ms_ecall_onchain_payment_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	unsigned char* _tmp_owner = ms->ms_owner;
+	size_t _len_owner = 40;
+	unsigned char* _in_owner = NULL;
+	unsigned char* _tmp_receiver = ms->ms_receiver;
+	size_t _len_receiver = 40;
+	unsigned char* _in_receiver = NULL;
+	unsigned char* _tmp_signed_tx = ms->ms_signed_tx;
+	unsigned int* _tmp_signed_tx_len = ms->ms_signed_tx_len;
+
+	CHECK_UNIQUE_POINTER(_tmp_owner, _len_owner);
+	CHECK_UNIQUE_POINTER(_tmp_receiver, _len_receiver);
+
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+
+	if (_tmp_owner != NULL && _len_owner != 0) {
+		if ( _len_owner % sizeof(*_tmp_owner) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		_in_owner = (unsigned char*)malloc(_len_owner);
+		if (_in_owner == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		if (memcpy_s(_in_owner, _len_owner, _tmp_owner, _len_owner)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
+
+	}
+	if (_tmp_receiver != NULL && _len_receiver != 0) {
+		if ( _len_receiver % sizeof(*_tmp_receiver) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		_in_receiver = (unsigned char*)malloc(_len_receiver);
+		if (_in_receiver == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		if (memcpy_s(_in_receiver, _len_receiver, _tmp_receiver, _len_receiver)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
+
+	}
+
+	ecall_onchain_payment(ms->ms_nonce, _in_owner, _in_receiver, ms->ms_amount, _tmp_signed_tx, _tmp_signed_tx_len);
 
 err:
 	if (_in_owner) free(_in_owner);
@@ -674,13 +754,14 @@ static sgx_status_t SGX_CDECL sgx_ecall_load_payment_data(void* pms)
 
 SGX_EXTERNC const struct {
 	size_t nr_ecall;
-	struct {void* ecall_addr; uint8_t is_priv;} ecall_table[15];
+	struct {void* ecall_addr; uint8_t is_priv;} ecall_table[16];
 } g_ecall_table = {
-	15,
+	16,
 	{
 		{(void*)(uintptr_t)sgx_ecall_preset_account, 0},
 		{(void*)(uintptr_t)sgx_ecall_create_account, 0},
 		{(void*)(uintptr_t)sgx_ecall_create_channel, 0},
+		{(void*)(uintptr_t)sgx_ecall_onchain_payment, 0},
 		{(void*)(uintptr_t)sgx_ecall_pay, 0},
 		{(void*)(uintptr_t)sgx_ecall_get_balance, 0},
 		{(void*)(uintptr_t)sgx_ecall_close_channel, 0},
@@ -698,11 +779,11 @@ SGX_EXTERNC const struct {
 
 SGX_EXTERNC const struct {
 	size_t nr_ocall;
-	uint8_t entry_table[1][15];
+	uint8_t entry_table[1][16];
 } g_dyn_entry_table = {
 	1,
 	{
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
 	}
 };
 

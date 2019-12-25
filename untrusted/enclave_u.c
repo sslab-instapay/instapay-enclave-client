@@ -19,6 +19,15 @@ typedef struct ms_ecall_create_channel_t {
 	unsigned int* ms_signed_tx_len;
 } ms_ecall_create_channel_t;
 
+typedef struct ms_ecall_onchain_payment_t {
+	unsigned int ms_nonce;
+	unsigned char* ms_owner;
+	unsigned char* ms_receiver;
+	unsigned int ms_amount;
+	unsigned char* ms_signed_tx;
+	unsigned int* ms_signed_tx_len;
+} ms_ecall_onchain_payment_t;
+
 typedef struct ms_ecall_pay_t {
 	unsigned int ms_channel_id;
 	unsigned int ms_amount;
@@ -156,6 +165,20 @@ sgx_status_t ecall_create_channel(sgx_enclave_id_t eid, unsigned int nonce, unsi
 	return status;
 }
 
+sgx_status_t ecall_onchain_payment(sgx_enclave_id_t eid, unsigned int nonce, unsigned char* owner, unsigned char* receiver, unsigned int amount, unsigned char* signed_tx, unsigned int* signed_tx_len)
+{
+	sgx_status_t status;
+	ms_ecall_onchain_payment_t ms;
+	ms.ms_nonce = nonce;
+	ms.ms_owner = owner;
+	ms.ms_receiver = receiver;
+	ms.ms_amount = amount;
+	ms.ms_signed_tx = signed_tx;
+	ms.ms_signed_tx_len = signed_tx_len;
+	status = sgx_ecall(eid, 3, &ocall_table_enclave, &ms);
+	return status;
+}
+
 sgx_status_t ecall_pay(sgx_enclave_id_t eid, unsigned int channel_id, unsigned int amount, int* is_success)
 {
 	sgx_status_t status;
@@ -163,7 +186,7 @@ sgx_status_t ecall_pay(sgx_enclave_id_t eid, unsigned int channel_id, unsigned i
 	ms.ms_channel_id = channel_id;
 	ms.ms_amount = amount;
 	ms.ms_is_success = is_success;
-	status = sgx_ecall(eid, 3, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 4, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -173,7 +196,7 @@ sgx_status_t ecall_get_balance(sgx_enclave_id_t eid, unsigned int channel_id, un
 	ms_ecall_get_balance_t ms;
 	ms.ms_channel_id = channel_id;
 	ms.ms_balance = balance;
-	status = sgx_ecall(eid, 4, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 5, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -185,7 +208,7 @@ sgx_status_t ecall_close_channel(sgx_enclave_id_t eid, unsigned int nonce, unsig
 	ms.ms_channel_id = channel_id;
 	ms.ms_signed_tx = signed_tx;
 	ms.ms_signed_tx_len = signed_tx_len;
-	status = sgx_ecall(eid, 5, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 6, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -197,7 +220,7 @@ sgx_status_t ecall_eject(sgx_enclave_id_t eid, unsigned int nonce, unsigned int 
 	ms.ms_pn = pn;
 	ms.ms_signed_tx = signed_tx;
 	ms.ms_signed_tx_len = signed_tx_len;
-	status = sgx_ecall(eid, 6, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 7, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -209,7 +232,7 @@ sgx_status_t ecall_receive_create_channel(sgx_enclave_id_t eid, unsigned int cha
 	ms.ms_owner = owner;
 	ms.ms_receiver = receiver;
 	ms.ms_deposit = deposit;
-	status = sgx_ecall(eid, 7, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 8, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -221,7 +244,7 @@ sgx_status_t ecall_go_pre_update(sgx_enclave_id_t eid, unsigned int payment_num,
 	ms.ms_channel_id = channel_id;
 	ms.ms_amount = amount;
 	ms.ms_size = size;
-	status = sgx_ecall(eid, 8, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 9, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -233,7 +256,7 @@ sgx_status_t ecall_go_post_update(sgx_enclave_id_t eid, unsigned int payment_num
 	ms.ms_channel_id = channel_id;
 	ms.ms_amount = amount;
 	ms.ms_size = size;
-	status = sgx_ecall(eid, 9, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 10, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -242,7 +265,7 @@ sgx_status_t ecall_go_idle(sgx_enclave_id_t eid, unsigned int payment_num)
 	sgx_status_t status;
 	ms_ecall_go_idle_t ms;
 	ms.ms_payment_num = payment_num;
-	status = sgx_ecall(eid, 10, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 11, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -254,7 +277,7 @@ sgx_status_t ecall_register_comminfo(sgx_enclave_id_t eid, unsigned int channel_
 	ms.ms_ip = ip;
 	ms.ms_ip_size = ip_size;
 	ms.ms_port = port;
-	status = sgx_ecall(eid, 11, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 12, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -264,7 +287,7 @@ sgx_status_t ecall_load_account_data(sgx_enclave_id_t eid, unsigned char* addr, 
 	ms_ecall_load_account_data_t ms;
 	ms.ms_addr = addr;
 	ms.ms_seckey = seckey;
-	status = sgx_ecall(eid, 12, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 13, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -284,7 +307,7 @@ sgx_status_t ecall_load_channel_data(sgx_enclave_id_t eid, unsigned int channel_
 	ms.ms_other_ip = other_ip;
 	ms.ms_ip_size = ip_size;
 	ms.ms_other_port = other_port;
-	status = sgx_ecall(eid, 13, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 14, &ocall_table_enclave, &ms);
 	return status;
 }
 
@@ -295,7 +318,7 @@ sgx_status_t ecall_load_payment_data(sgx_enclave_id_t eid, unsigned int payment_
 	ms.ms_payment_num = payment_num;
 	ms.ms_channel_id = channel_id;
 	ms.ms_amount = amount;
-	status = sgx_ecall(eid, 14, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 15, &ocall_table_enclave, &ms);
 	return status;
 }
 
