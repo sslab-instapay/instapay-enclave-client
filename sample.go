@@ -132,5 +132,24 @@ func main() {
 	OtherPort := C.uint(7889)
 
     C.ecall_load_channel_data_w(ChannelID, IsIn, ChannelStatus, &MyAddr[0], MyDeposit, OtherDeposit, Balance, LockedBalance, &OtherAddr[0], &OtherIP[0], OtherPort);
-    fmt.Printf("\nCHANNEL 9 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(9)))
+	fmt.Printf("\nCHANNEL 9 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(9)))
+	
+
+	/* calling ecall_close_channel_w */
+	nonce = C.uint(0)
+	ChannelID = C.uint(9)
+	SigLen = C.uint(0)
+
+	var sig2 *C.uchar = C.ecall_close_channel_w(nonce, ChannelID, &SigLen)
+	hdr2 := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(sig2)),
+		Len:  int(SigLen),
+		Cap:  int(SigLen),
+	}
+
+	s2 := *(*[]C.uchar)(unsafe.Pointer(&hdr2))
+	for i := C.uint(0); i < SigLen; i++ {
+        fmt.Printf("%02x", s2[i])
+	}
+	fmt.Println()
 }

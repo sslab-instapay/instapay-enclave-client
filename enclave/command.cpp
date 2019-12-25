@@ -1,3 +1,5 @@
+#include <stdio.h>    // vsnprintf
+#include <stdarg.h>   // va_list
 #include <string.h>
 #include <stdint.h>
 #include <cstring>
@@ -109,7 +111,7 @@ void ecall_onchain_payment(unsigned int nonce, unsigned char *owner, unsigned ch
     sha3_context sha3_ctx;
 
     /* generate a transaction creating a channel */
-    Transaction tx(nonce, receiver, amount, null, 0);
+    Transaction tx(nonce, receiver, amount, NULL, 0);
 
     // TODO: find the account's private key and sign on transaction using
     tx.sign((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd");
@@ -168,9 +170,18 @@ void ecall_close_channel(unsigned int nonce, unsigned int channel_id, unsigned c
     }
 
     data.insert(data.end(), msg32, msg32 + 4);
-    data.insert(data.end(), channel_id, channel_id + 32);  // TODO: fix byte range ?
-    data.insert(data.end(), source_bal, source_bal + 32);  // TODO: fix byte range ?
-    data.insert(data.end(), target_bal, target_bal + 32);  // TODO: fix byte range ?
+
+
+    /* convert to numbers which have leading zeros to use as contract function's arguments */
+    unsigned char *channel_id_bytes, *source_bal_bytes, *target_bal_bytes;
+
+    channel_id_bytes = create_uint256_argument(channel_id);
+    source_bal_bytes = create_uint256_argument(source_bal);
+    target_bal_bytes = create_uint256_argument(target_bal);
+    
+    data.insert(data.end(), channel_id_bytes, channel_id_bytes + 32);
+    data.insert(data.end(), source_bal_bytes, source_bal_bytes + 32);
+    data.insert(data.end(), target_bal_bytes, target_bal_bytes + 32);
 
 
     /* generate a transaction creating a channel */
@@ -208,6 +219,9 @@ void ecall_eject(unsigned int nonce, unsigned int pn, unsigned char *signed_tx, 
     unsigned int head_pn, head_stage, head_ids, head_bals, head_v;
     unsigned int ids_size, bals_size, e, source_bal, target_bal;
 
+    unsigned char *head_pn_bytes, *stage_bytes, *head_ids_bytes, *head_bals_bytes, *v_bytes;
+    unsigned char *ids_size_bytes, *bals_size_bytes, *id_bytes, *source_bal_bytes, *target_bal_bytes;
+
     e = payments.find(pn)->second.m_related_channels.at(0).channel_id;
     stage = channels.find(e)->second.m_status;
 
@@ -220,40 +234,53 @@ void ecall_eject(unsigned int nonce, unsigned int pn, unsigned char *signed_tx, 
 
     head_pn = pn;
     head_stage = stage;
-    head_ids = total_head_size;
-    head_bals = total_head_size + 32 + 32 * payments.find(pn)->second.m_related_channels.size();
+    head_ids = total_headsize;
+    head_bals = total_headsize + 32 + 32 * payments.find(pn)->second.m_related_channels.size();
     head_v = abs(payments.find(pn)->second.m_related_channels.at(0).amount);
+
+    head_pn_bytes = create_uint256_argument(head_pn);
+    stage_bytes = create_uint256_argument(head_stage);
+    head_ids_bytes = create_uint256_argument(head_ids);
+    head_bals_bytes = create_uint256_argument(head_bals);
+    v_bytes = create_uint256_argument(head_v);
 
 
     data.insert(data.end(), msg32, msg32 + 4);
 
-    data.insert(data.end(), head_pn, head_pn + 1);       // pn: head(pn) = enc(pn)
-    data.insert(data.end(), head_stage, head_stage + 1); // stage: head(stage) = enc(stage)
-    data.insert(data.end(), head_ids, head_ids + 1);       // ids: head(ids) = enc(len(head(pn) head(stage) head(ids) head(bals) head(v) tail(pn) tail(stage)))
-    data.insert(data.end(), head_bals, head_bals + 1);       // bals: head(bals) = enc(len(head(pn) head(stage) head(ids) head(bals) head(v) tail(pn) tail(stage) tail(ids)))
-    data.insert(data.end(), head_v, head_v + 1);       // v: head(v) = enc(v)
+    data.insert(data.end(), head_pn_bytes, head_pn_bytes + 32);       // pn: head(pn) = enc(pn)
+    data.insert(data.end(), stage_bytes, stage_bytes + 32); // stage: head(stage) = enc(stage)
+    data.insert(data.end(), head_ids_bytes, head_ids_bytes + 32);       // ids: head(ids) = enc(len(head(pn) head(stage) head(ids) head(bals) head(v) tail(pn) tail(stage)))
+    data.insert(data.end(), head_bals_bytes, head_bals_bytes + 32);       // bals: head(bals) = enc(len(head(pn) head(stage) head(ids) head(bals) head(v) tail(pn) tail(stage) tail(ids)))
+    data.insert(data.end(), v_bytes, v_bytes + 32);       // v: head(v) = enc(v)
 
     ids_size = payments.find(pn)->second.m_related_channels.size();
-    data.insert(data.end(), ids_size, ids_size + 1);
+    ids_size_bytes = create_uint256_argument(ids_size);
+    data.insert(data.end(), ids_size_bytes, ids_size_bytes + 32);
     for(int i = 0; i < ids_size; i++) {
         e = payments.find(pn)->second.m_related_channels.at(i).channel_id;
-        data.insert(data.end(), e, e + 1);
+        id_bytes = create_uint256_argument(e);
+        data.insert(data.end(), id_bytes, id_bytes + 32);
     }
 
     bals_size = ids_size * 2;
-    data.insert(data.end(), bals_size, bals_size + 1);
+    bals_size_bytes = create_uint256_argument(bals_size);
+    data.insert(data.end(), bals_size_bytes, bals_size_bytes + 32);
     for(int i = 0; i < ids_size; i++) {
         e = payments.find(pn)->second.m_related_channels.at(i).channel_id;
         if(channels.find(e)->second.m_is_in == 0) { // owner is me
             source_bal = channels.find(e)->second.m_balance;
-            target_bal = channels.find(e)->second.m_my_deposit - channels.find(channel_id)->second.m_balance;
+            target_bal = channels.find(e)->second.m_my_deposit - channels.find(e)->second.m_balance;
         }
         else {  // owner is not me
-            source_bal = channels.find(e)->second.m_other_deposit - channels.find(channel_id)->second.m_balance;
+            source_bal = channels.find(e)->second.m_other_deposit - channels.find(e)->second.m_balance;
             target_bal = channels.find(e)->second.m_balance;
         }
-        data.insert(data.end(), source_bal, source_bal + 1);
-        data.insert(data.end(), target_bal, target_bal + 1);
+
+        source_bal_bytes = create_uint256_argument(source_bal);
+        target_bal_bytes = create_uint256_argument(target_bal);
+
+        data.insert(data.end(), source_bal_bytes, source_bal_bytes + 32);
+        data.insert(data.end(), target_bal_bytes, target_bal_bytes + 32);
     }
 
 

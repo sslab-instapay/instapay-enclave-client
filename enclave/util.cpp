@@ -51,3 +51,15 @@ unsigned char* arr_to_bytes(unsigned char *data, unsigned int size)
 
     return output;
 }
+
+
+unsigned char* create_uint256_argument(unsigned int a)
+{
+    unsigned char a_buf[65];
+    unsigned char* output;
+
+    snprintf((char *)a_buf, 65, "%064x", a);
+    output = ::arr_to_bytes(a_buf, 64);
+
+    return output;
+}
