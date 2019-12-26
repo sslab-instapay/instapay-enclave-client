@@ -29,7 +29,7 @@ class Transaction {
                     )
                     : m_nonce(t_nonce)
                     , m_gas_price(1000000000)
-                    , m_gas_limit(10000000)
+                    , m_gas_limit(21000)
                     , m_value(t_value)
                     , m_v(0x01)
                     , m_data_size(t_data_size)
