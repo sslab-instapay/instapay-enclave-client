@@ -12,19 +12,32 @@ import (
 	"fmt"
 	"unsafe"
 	"reflect"
+	"context"
+	"log"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
 	C.initialize_enclave()
 
 	/* calling ecall_onchain_payment */
-	nonce := C.uint(0)
+	client, err := ethclient.Dial("ws://141.223.121.139:8881")
+	if err != nil{
+		log.Println(err)
+	}
+
 	owner := []C.uchar("D03A2CC08755eC7D75887f0997195654b928893e")
 	receiver := []C.uchar("0b4161ad4f49781a821c308d672e6c669139843c")
 	amount := C.uint(8)
 	SigLen := C.uint(0)
 
-	var sig *C.uchar = C.ecall_onchain_payment_w(nonce, &owner[0], &receiver[0], amount, &SigLen)
+	address := common.HexToAddress("0xD03A2CC08755eC7D75887f0997195654b928893e")
+	nonce, err := client.PendingNonceAt(context.Background(), address)
+
+	convertedNonce := C.uint(nonce)
+
+	var sig *C.uchar = C.ecall_onchain_payment_w(convertedNonce, &owner[0], &receiver[0], amount, &SigLen)
 	hdr := reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(sig)),
 		Len:  int(SigLen),
