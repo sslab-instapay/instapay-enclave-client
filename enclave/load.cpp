@@ -5,65 +5,79 @@
 
 #include "enclave.h"
 #include "enclave_t.h"
+#include "sgx_trts.h"
+#include "sgx_tseal.h"
 
 
-void ecall_load_account_data(unsigned char *addr, unsigned char *seckey)
+void ecall_load_account_data(unsigned char *sealed_seckey)
 {
-    unsigned char *addr_bytes = ::arr_to_bytes(addr, 40);
-    unsigned char *seckey_bytes = ::arr_to_bytes(seckey, 64);
+    uint32_t unsealed_size = 32;
+    uint8_t unsealed_seckey[32];
 
-    std::vector<unsigned char> p(addr_bytes, addr_bytes + 20);
-    std::vector<unsigned char> s(seckey_bytes, seckey_bytes + 32);
+    sgx_unseal_data((sgx_sealed_data_t *)sealed_seckey, NULL, 0, (uint8_t *)&unsealed_seckey, &unsealed_size);
 
-    accounts.insert(map_account_value(p, Account(s)));  
+    printf("UNSEALED SECKEY: ");
+    for(int i = 0; i < 32; i++)
+        printf("%02x", unsealed_seckey[i]);
+    printf("\n");
+
+    std::vector<unsigned char> seckey(unsealed_seckey, unsealed_seckey + 32);
+    Account account(seckey);
+
+    std::vector<unsigned char> pubkey = account.get_pubkey();
+
+    accounts.insert(map_account_value(pubkey, account));
+
+    return;
 }
 
 
-void ecall_load_channel_data(
-    unsigned int channel_id,
-    unsigned int type,
-    unsigned int channel_status,
-    unsigned char *my_addr,
-    unsigned int my_deposit,
-    unsigned int other_deposit,
-    unsigned int balance,
-    unsigned int locked_balance,
-    unsigned char *other_addr,
-    unsigned char *other_ip,
-    unsigned int ip_size,
-    unsigned int other_port)
+void ecall_load_channel_data(unsigned char *sealed_channel_data)
 {
-    Channel channel;
+    uint32_t unsealed_size = sizeof(channel);
+    channel unsealed_channel_data;
 
-    channel.m_id = channel_id;
-    channel.m_is_in = type;
-
-    if(channel_status == PENDING)
-        channel.m_status = PENDING;
-    else if(channel_status == IDLE)
-        channel.m_status = IDLE;
-    else if(channel_status == PRE_UPDATE)
-        channel.m_status = PRE_UPDATE;
-    else if(channel_status == POST_UPDATE)
-        channel.m_status = POST_UPDATE;
-
-    channel.m_my_addr = ::arr_to_bytes(my_addr, 40);
-    channel.m_my_deposit = my_deposit;
-    channel.m_other_deposit = other_deposit;
-    channel.m_balance = balance;
-    channel.m_locked_balance = locked_balance;
-    channel.m_other_addr = ::arr_to_bytes(other_addr, 40);
-    channel.m_other_ip = ::copy_bytes(other_ip, ip_size);
-    channel.m_other_port = other_port;
-
-    channels.insert(map_channel_value(channel_id, channel));
-}
+    sgx_unseal_data((sgx_sealed_data_t *)sealed_channel_data, NULL, 0, (uint8_t *)&unsealed_channel_data, &unsealed_size);
 
 
-void ecall_load_payment_data(unsigned int payment_num, unsigned int channel_id, int amount)
-{
-    if(payments.find(payment_num) == payments.end())
-        payments.insert(map_payment_value(payment_num, Payment(payment_num)));
+    printf("=========== UNSEALED CHANNEL DATA ===========\n");
+    printf("channel id: %d\n", unsealed_channel_data.m_id);
+    printf("is in ?: %d\n", unsealed_channel_data.m_is_in);
+    printf("status: %d\n", unsealed_channel_data.m_status);
+
+    printf("my address: ");
+    for(int i = 0; i < 20; i++)
+        printf("%02x", unsealed_channel_data.m_my_addr[i]);
+    printf("\n");
+
+    printf("my deposit: %d\n", unsealed_channel_data.m_my_deposit);
+    printf("other deposit: %d\n", unsealed_channel_data.m_other_deposit);
+    printf("my balance: %d\n", unsealed_channel_data.m_balance);
+    printf("locked balance: %d\n", unsealed_channel_data.m_locked_balance);
+
+    printf("other address: ");
+    for(int i = 0; i < 20; i++)
+        printf("%02x", unsealed_channel_data.m_other_addr[i]);
+
+    printf("\n=============================================\n");
+
+
+    Channel ch;
+
+    ch.m_id = unsealed_channel_data.m_id;
+    ch.m_is_in = unsealed_channel_data.m_is_in;
+    ch.m_status = (channel_status)unsealed_channel_data.m_status;
+
+    ch.m_my_addr = ::copy_bytes(unsealed_channel_data.m_my_addr, 20);
     
-    payments.find(payment_num)->second.add_element(channel_id, amount);
+    ch.m_my_deposit = unsealed_channel_data.m_my_deposit;
+    ch.m_other_deposit = unsealed_channel_data.m_other_deposit;
+    ch.m_balance = unsealed_channel_data.m_balance;
+    ch.m_locked_balance = unsealed_channel_data.m_locked_balance;
+
+    ch.m_other_addr = ::copy_bytes(unsealed_channel_data.m_other_addr, 20);
+
+    channels.insert(map_channel_value(ch.m_id, ch));
+
+    return;
 }

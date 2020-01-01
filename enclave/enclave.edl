@@ -2,7 +2,19 @@
 
 enclave {
     untrusted {
+
+        /* store */
+
         void ocall_print_string([in, string] const char *str);
+
+        void ocall_remove_key_file(void);
+
+        void ocall_store_sealed_seckey([in, size=592] unsigned char *sealed_seckey);
+
+        void ocall_remove_channel_file(void);
+
+        void ocall_store_sealed_channel_data([in, size=628] unsigned char *sealed_seckey);
+
     };
 
     trusted {
@@ -53,6 +65,7 @@ enclave {
             [user_check] unsigned char *signed_tx,
             [user_check] unsigned int *signed_tx_len);
 
+
         /* event */
 
         public void ecall_receive_create_channel(
@@ -60,6 +73,7 @@ enclave {
             [in, size=40] unsigned char *owner,
             [in, size=40] unsigned char *receiver,
             unsigned int deposit);
+
 
         /* network */
 
@@ -84,32 +98,19 @@ enclave {
             unsigned int ip_size,
             unsigned int port);
 
-        /* load */
-        
-        public void ecall_load_account_data(
-            [in, size=40] unsigned char *addr,
-            [in, size=64] unsigned char *seckey);
-
-        public void ecall_load_channel_data(
-            unsigned int channel_id,
-            unsigned int type,
-            unsigned int channel_status,
-            [in, size=40] unsigned char *my_addr,
-            unsigned int my_deposit,
-            unsigned int other_deposit,
-            unsigned int balance,
-            unsigned int locked_balance,
-            [in, size=40] unsigned char *other_addr,
-            [user_check] unsigned char *other_ip,
-            unsigned int ip_size,
-            unsigned int other_port);
-
-        public void ecall_load_payment_data(
-            unsigned int payment_num,
-            unsigned int channel_id,
-            int amount);
 
         /* store */
+
+        public void ecall_store_account_data(void);
+
+        public void ecall_store_channel_data(void);
+
+
+        /* load */
+
+        public void ecall_load_account_data([in, size=592] unsigned char *sealed_seckey);
+
+        public void ecall_load_channel_data([in, size=628] unsigned char *sealed_channel_data);
 
     };
 };

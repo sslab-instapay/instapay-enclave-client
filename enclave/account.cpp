@@ -39,4 +39,10 @@ std::vector<unsigned char> Account::get_pubkey()
 }
 
 
+std::vector<unsigned char> Account::get_seckey()
+{    
+    return m_seckey;
+}
+
+
 map_account accounts;

@@ -25,6 +25,7 @@ class Account {
         };
 
         std::vector<unsigned char> get_pubkey(void);
+        std::vector<unsigned char> get_seckey(void);
 
     private:
         std::vector<unsigned char> m_seckey;

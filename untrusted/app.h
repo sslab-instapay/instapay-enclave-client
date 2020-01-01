@@ -46,21 +46,13 @@ void ecall_register_comminfo_w(unsigned int channel_id, unsigned char *ip, unsig
 /* event.cpp */
 void ecall_receive_create_channel_w(unsigned int channel_id, unsigned char *owner, unsigned char *receiver, unsigned int deposit);
 
+/* store.cpp */
+void ecall_store_account_data_w(void);
+void ecall_store_channel_data_w(void);
+
 /* load.cpp */
-void ecall_load_account_data_w(unsigned char *addr, unsigned char *seckey);
-void ecall_load_channel_data_w(
-    unsigned int channel_id,
-    unsigned int type,
-    unsigned int channel_status,
-    unsigned char *my_addr,
-    unsigned int my_deposit,
-    unsigned int other_deposit,
-    unsigned int balance,
-    unsigned int locked_balance,
-    unsigned char *other_addr,
-    unsigned char *other_ip,
-    unsigned int other_port);
-void ecall_load_payment_data_w(unsigned int payment_num, unsigned int channel_id, int amount);
+void ecall_load_account_data_w(void);
+void ecall_load_channel_data_w(void);
 
 #if defined(__cplusplus)
 }

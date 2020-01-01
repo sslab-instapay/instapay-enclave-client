@@ -1,46 +1,39 @@
 #include "app.h"
 #include "enclave_u.h"
 
+#include <stdio.h>
 #include <string.h>
 
 
-void ecall_load_account_data_w(unsigned char *addr, unsigned char *seckey)
+void ecall_load_account_data_w()
 {
-    ecall_load_account_data(global_eid, addr, seckey);    
+    FILE *fp = fopen("./data/key/a0", "rb");   // sealed log size = 592
+    unsigned char sealed_seckey[600];
+    int count;
+
+    while(1) {
+        count = fread(sealed_seckey, sizeof(unsigned char), 592, fp);
+        if(count < 592) break;
+        printf("read %d bytes from ./data/key/a0\n", count);
+        ecall_load_account_data(global_eid, sealed_seckey);
+    }
+
+    fclose(fp);
 }
 
 
-void ecall_load_channel_data_w(
-    unsigned int channel_id,
-    unsigned int type,
-    unsigned int channel_status,
-    unsigned char *my_addr,
-    unsigned int my_deposit,
-    unsigned int other_deposit,
-    unsigned int balance,
-    unsigned int locked_balance,
-    unsigned char *other_addr,
-    unsigned char *other_ip,
-    unsigned int other_port)
+void ecall_load_channel_data_w()
 {
-    ecall_load_channel_data(
-        global_eid,
-        channel_id,
-        type,
-        channel_status,
-        my_addr,
-        my_deposit,
-        other_deposit,
-        balance,
-        locked_balance,
-        other_addr,
-        other_ip,
-        strlen((char*)other_ip),
-        other_port);
-}
+    FILE *fp = fopen("./data/channel/c0", "rb");   // sealed log size = 628
+    unsigned char sealed_channel_data[700];
+    int count;
 
+    while(1) {
+        count = fread(sealed_channel_data, sizeof(unsigned char), 628, fp);
+        if(count < 628) break;
+        printf("read %d bytes from ./data/channel/c0\n", count);
+        ecall_load_channel_data(global_eid, sealed_channel_data);
+    }
 
-void ecall_load_payment_data_w(unsigned int payment_num, unsigned int channel_id, int amount)
-{
-    ecall_load_payment_data(global_eid, payment_num, channel_id, amount);
+    fclose(fp);
 }

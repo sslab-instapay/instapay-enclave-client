@@ -11,6 +11,23 @@ enum channel_status {
 	POST_UPDATE	= 3,
 };
 
+
+typedef struct _channel
+{
+    unsigned int m_id;
+    unsigned int m_is_in;
+    unsigned int m_status;
+    unsigned char m_my_addr[20];
+    unsigned int m_my_deposit;
+    unsigned int m_other_deposit;
+    unsigned int m_balance;
+    unsigned int m_locked_balance;
+    unsigned char m_other_addr[20];
+    // unsigned char *m_other_ip;   this field must be requested from the server newly
+    // unsigned int m_other_port;   this field must be requested from the server newly
+} channel;
+
+
 class Channel {
     public:
         Channel() {};
