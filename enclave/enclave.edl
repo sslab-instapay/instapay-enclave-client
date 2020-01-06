@@ -74,6 +74,11 @@ enclave {
             [in, size=40] unsigned char *receiver,
             unsigned int deposit);
 
+        public void ecall_receive_close_channel(
+            unsigned int channel_id,
+            unsigned int owner_bal,
+            unsigned int receiver_bal);
+
 
         /* network */
 
