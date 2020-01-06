@@ -34,3 +34,10 @@ void ecall_receive_create_channel(unsigned int channel_id, unsigned char *owner,
 
     return;
 }
+
+
+void ecall_receive_close_channel(unsigned int channel_id, unsigned int owner_bal, unsigned int receiver_bal)
+{
+    if(channels.find(channel_id) != channels.end())
+        channels.erase(channel_id);
+}

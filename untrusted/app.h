@@ -45,6 +45,7 @@ void ecall_register_comminfo_w(unsigned int channel_id, unsigned char *ip, unsig
 
 /* event.cpp */
 void ecall_receive_create_channel_w(unsigned int channel_id, unsigned char *owner, unsigned char *receiver, unsigned int deposit);
+void ecall_receive_close_channel_w(unsigned int channel_id, unsigned int owner_bal, unsigned int receiver_bal);
 
 /* store.cpp */
 void ecall_store_account_data_w(void);
