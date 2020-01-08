@@ -88,5 +88,6 @@ typedef std::map<unsigned int, Channel> map_channel;
 typedef map_channel::value_type map_channel_value;
 
 extern map_channel channels;
+extern map_channel closed_channels;
 
 #endif

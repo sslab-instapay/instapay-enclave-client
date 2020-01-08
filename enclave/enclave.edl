@@ -25,6 +25,11 @@ enclave {
             [in, size=40] unsigned char *addr,
             [in, size=64] unsigned char *seckey);
 
+        public void ecall_preset_payment(
+            unsigned int pn,
+            unsigned int channel_id,
+            int amount);
+
         public void ecall_create_account(
             [user_check] unsigned char *generated_addr);
 
@@ -64,6 +69,24 @@ enclave {
             unsigned int pn,
             [user_check] unsigned char *signed_tx,
             [user_check] unsigned int *signed_tx_len);
+
+        public void ecall_get_num_open_channels(
+            [user_check] unsigned int *num_open_channels);
+
+        public void ecall_get_open_channels(
+            [user_check] unsigned char *open_channels);
+
+        public void ecall_get_num_closed_channels(
+            [user_check] unsigned int *num_closed_channels);
+
+        public void ecall_get_closed_channels(
+            [user_check] unsigned char *closed_channels);
+
+        public void ecall_get_num_public_addrs(
+            [user_check] unsigned int *num_public_addrs);
+
+        public void ecall_get_public_addrs(
+            [user_check] unsigned char *public_addrs);
 
 
         /* event */

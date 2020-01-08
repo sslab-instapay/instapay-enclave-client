@@ -44,3 +44,4 @@ unsigned int Channel::get_balance()
 
 
 map_channel channels;
+map_channel closed_channels;

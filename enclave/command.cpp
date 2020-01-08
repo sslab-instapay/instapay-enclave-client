@@ -32,6 +32,15 @@ void ecall_preset_account(unsigned char *addr, unsigned char *seckey)
 }
 
 
+void ecall_preset_payment(unsigned int pn, unsigned int channel_id, int amount)
+{
+    payments.insert(map_payment_value(pn, Payment(pn)));
+    payments.find(pn)->second.add_element(channel_id, amount);
+
+    return;
+}
+
+
 void ecall_create_account(unsigned char *generated_addr)
 {
     /* generate a secret key */
@@ -91,6 +100,8 @@ void ecall_create_channel(unsigned int nonce, unsigned char *owner, unsigned cha
     unsigned char *addr = ::arr_to_bytes(receiver, 40);
     data.insert(data.end(), msg32, msg32 + 4);
     data.insert(data.end(), addr, addr + 20);
+
+    // deposit *= 1000000000000000000;
 
     /* generate a transaction creating a channel */
     Transaction tx(nonce, CONTRACT_ADDR, deposit, data.data(), data.size());
@@ -295,4 +306,150 @@ void ecall_eject(unsigned int nonce, unsigned int pn, unsigned char *signed_tx, 
     *signed_tx_len = tx.signed_tx.size();
 
     return;
+}
+
+
+void ecall_get_num_open_channels(unsigned int *num_open_channels)
+{
+    /********************** test dummy **********************/
+    // unsigned char *my_addr, *other_addr;
+    // Channel channel1, channel2;
+
+    // my_addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
+    // other_addr = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
+
+    // channel1.m_id = 8;
+    // channel1.m_is_in = 1;
+
+    // channel1.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
+
+    // channel1.m_my_addr = ::arr_to_bytes(my_addr, 40);
+    // channel1.m_my_deposit = 0;
+    // channel1.m_other_deposit = 90;
+    // channel1.m_balance = 30;
+    // channel1.m_locked_balance = 0;
+    // channel1.m_other_addr = ::arr_to_bytes(other_addr, 40);
+
+    // my_addr = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
+    // other_addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
+
+    // channel2.m_id = 12;
+    // channel2.m_is_in = 0;
+
+    // channel2.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
+
+    // channel2.m_my_addr = ::arr_to_bytes(my_addr, 40);
+    // channel2.m_my_deposit = 70;
+    // channel2.m_other_deposit = 0;
+    // channel2.m_balance = 50;
+    // channel2.m_locked_balance = 0;
+    // channel2.m_other_addr = ::arr_to_bytes(other_addr, 40);
+
+    // channels.insert(map_channel_value(8, channel1));
+    // channels.insert(map_channel_value(12, channel2));
+    /********************************************************/
+
+    *num_open_channels = channels.size();
+}
+
+
+void ecall_get_open_channels(unsigned char *open_channels)
+{
+    //struct _channel *ochs = (struct _channel*)malloc(sizeof(struct _channel) * channels.size());
+
+    channel data;
+    std::map<unsigned int, Channel>::iterator iter;
+
+    unsigned int cursor = 0;
+
+    for (iter = channels.begin(); iter != channels.end(); ++iter) {
+        data.m_id = iter->second.m_id;
+        data.m_is_in = iter->second.m_is_in;
+        data.m_status = iter->second.m_status;
+        memcpy(data.m_my_addr, iter->second.m_my_addr, 20);
+        data.m_my_deposit = iter->second.m_my_deposit;
+        data.m_other_deposit = iter->second.m_other_deposit;
+        data.m_balance = iter->second.m_balance;
+        data.m_locked_balance = iter->second.m_locked_balance;
+        memcpy(data.m_other_addr, iter->second.m_other_addr, 20);
+
+        memcpy(open_channels + cursor, (unsigned char*)&data, sizeof(channel));
+        cursor += sizeof(channel);
+    }
+}
+
+
+void ecall_get_num_closed_channels(unsigned int *num_closed_channels)
+{
+    *num_closed_channels = channels.size();
+}
+
+
+void ecall_get_closed_channels(unsigned char *closed_chs)
+{
+    channel data;
+    std::map<unsigned int, Channel>::iterator iter;
+
+    unsigned int cursor = 0;
+
+    for (iter = closed_channels.begin(); iter != closed_channels.end(); ++iter) {
+        data.m_id = iter->second.m_id;
+        data.m_is_in = iter->second.m_is_in;
+        data.m_status = iter->second.m_status;
+        memcpy(data.m_my_addr, iter->second.m_my_addr, 20);
+        data.m_my_deposit = iter->second.m_my_deposit;
+        data.m_other_deposit = iter->second.m_other_deposit;
+        data.m_balance = iter->second.m_balance;
+        data.m_locked_balance = iter->second.m_locked_balance;
+        memcpy(data.m_other_addr, iter->second.m_other_addr, 20);
+
+        memcpy(closed_chs + cursor, (unsigned char*)&data, sizeof(channel));
+        cursor += sizeof(channel);
+    }
+}
+
+
+void ecall_get_num_public_addrs(unsigned int *num_public_addrs)
+{
+    /********************** test dummy **********************/
+    // unsigned char* paddr1 = (unsigned char*)"ABCDEABCDEABCDEABCDE";
+    // unsigned char* sk1 = (unsigned char*)"ABCDEABCDEABCDEABCDEABCDEABCDEAB";
+    // std::vector<unsigned char> p(paddr1, paddr1 + 20);
+    // std::vector<unsigned char> s(sk1, sk1 + 32);
+
+    // accounts.insert(map_account_value(p, Account(s)));
+
+    // unsigned char* paddr2 = (unsigned char*)"VWXYZVWXYZVWXYZVWXYZ";
+    // unsigned char* sk2 = (unsigned char*)"VWXYZVWXYZVWXYZVWXYZVWXYZVWXYZVW";
+    // std::vector<unsigned char> p2(paddr2, paddr2 + 20);
+    // std::vector<unsigned char> s2(sk2, sk2 + 32);
+
+    // accounts.insert(map_account_value(p2, Account(s2)));
+    /********************************************************/
+
+    *num_public_addrs = accounts.size();
+}
+
+
+void ecall_get_public_addrs(unsigned char *public_addrs)
+{
+    address data;
+    std::map<std::vector<unsigned char>, Account>::iterator iter;
+    std::vector<unsigned char> pubaddr;
+
+    unsigned int cursor = 0;
+
+    // for (iter = accounts.begin(); iter != accounts.end(); ++iter) {
+    //     pubaddr = iter->second.get_pubkey();
+    //     memcpy(data.addr, pubaddr.data(), 20);
+    //     memcpy(public_addrs + cursor, (unsigned char*)&data, sizeof(address));
+    //     cursor += sizeof(address);
+    // }
+
+    for (iter = accounts.begin(); iter != accounts.end(); ++iter) {
+        pubaddr = iter->first;
+        memcpy(data.addr, pubaddr.data(), 20);
+        memcpy(public_addrs + cursor, (unsigned char*)&data, sizeof(address));
+        cursor += sizeof(address);
+    }
 }

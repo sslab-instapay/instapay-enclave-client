@@ -18,6 +18,13 @@ extern "C" {
 
 using namespace std;
 
+
+typedef struct _address
+{
+    unsigned char addr[20];
+} address;
+
+
 class Account {
     public:
         Account(std::vector<unsigned char> t_seckey) {

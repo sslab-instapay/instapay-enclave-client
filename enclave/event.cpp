@@ -38,6 +38,8 @@ void ecall_receive_create_channel(unsigned int channel_id, unsigned char *owner,
 
 void ecall_receive_close_channel(unsigned int channel_id, unsigned int owner_bal, unsigned int receiver_bal)
 {
-    if(channels.find(channel_id) != channels.end())
+    if(channels.find(channel_id) != channels.end()) {
+        closed_channels.insert(map_channel_value(channel_id, channels.find(channel_id)->second));
         channels.erase(channel_id);
+    }
 }

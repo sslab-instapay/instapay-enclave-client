@@ -8,6 +8,12 @@ void ecall_preset_account_w(unsigned char *addr, unsigned char *seckey)
 }
 
 
+void ecall_preset_payment_w(unsigned int pn, unsigned int channel_id, int amount)
+{
+    ecall_preset_payment(global_eid, pn, channel_id, amount);
+}
+
+
 unsigned char* ecall_create_account_w(void)
 {
     unsigned char *generated_addr = new unsigned char[20];
@@ -70,5 +76,47 @@ unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *
     ecall_eject(global_eid, nonce, pn, signed_tx, &signed_tx_len);
     *sig_len = signed_tx_len;
     
-    return signed_tx;    
+    return signed_tx;
+}
+
+
+void* ecall_get_open_channels_w(void)
+{
+    unsigned char *open_channels;
+    unsigned int num_open_channels;
+
+    ecall_get_num_open_channels(global_eid, &num_open_channels);
+    open_channels = (unsigned char*)malloc(sizeof(channel) * num_open_channels);
+
+    ecall_get_open_channels(global_eid, open_channels);
+
+    return open_channels;
+}
+
+
+void* ecall_get_closed_channels_w(void)
+{
+    unsigned char *closed_channels;
+    unsigned int num_closed_channels;
+
+    ecall_get_num_closed_channels(global_eid, &num_closed_channels);
+    closed_channels = (unsigned char*)malloc(sizeof(channel) * num_closed_channels);
+
+    ecall_get_open_channels(global_eid, closed_channels);
+
+    return closed_channels;
+}
+
+
+void* ecall_get_public_addrs_w(void)
+{
+    unsigned char *public_addrs;
+    unsigned int num_public_addrs;
+
+    ecall_get_num_public_addrs(global_eid, &num_public_addrs);
+    public_addrs = (unsigned char*)malloc(sizeof(address) * num_public_addrs);
+
+    ecall_get_public_addrs(global_eid, public_addrs);
+
+    return public_addrs;
 }
