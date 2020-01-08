@@ -12,26 +12,26 @@
 void ecall_store_account_data()
 {
     /********************** test dummy **********************/
-    unsigned char *addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
-    unsigned char *sk = (unsigned char*)"0fdd3c2c175a07765466c728730c86e1d5cbf2e1b2f6e475292b742e8df47574";
+    // unsigned char *addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
+    // unsigned char *sk = (unsigned char*)"0fdd3c2c175a07765466c728730c86e1d5cbf2e1b2f6e475292b742e8df47574";
 
-    unsigned char *addr_bytes = ::arr_to_bytes(addr, 40);
-    unsigned char *sk_bytes = ::arr_to_bytes(sk, 64);
+    // unsigned char *addr_bytes = ::arr_to_bytes(addr, 40);
+    // unsigned char *sk_bytes = ::arr_to_bytes(sk, 64);
 
-    std::vector<unsigned char> p(addr_bytes, addr_bytes + 20);
-    std::vector<unsigned char> s(sk_bytes, sk_bytes + 32);
+    // std::vector<unsigned char> p(addr_bytes, addr_bytes + 20);
+    // std::vector<unsigned char> s(sk_bytes, sk_bytes + 32);
 
-    unsigned char *addr2 = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
-    unsigned char *sk2 = (unsigned char*)"902424638988c6fd60caa0453735f583f4bfe124233366201a419202963ddc06";
+    // unsigned char *addr2 = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
+    // unsigned char *sk2 = (unsigned char*)"902424638988c6fd60caa0453735f583f4bfe124233366201a419202963ddc06";
 
-    unsigned char *addr_bytes2 = ::arr_to_bytes(addr2, 40);
-    unsigned char *sk_bytes2 = ::arr_to_bytes(sk2, 64);
+    // unsigned char *addr_bytes2 = ::arr_to_bytes(addr2, 40);
+    // unsigned char *sk_bytes2 = ::arr_to_bytes(sk2, 64);
 
-    std::vector<unsigned char> p2(addr_bytes2, addr_bytes2 + 20);
-    std::vector<unsigned char> s2(sk_bytes2, sk_bytes2 + 32);
+    // std::vector<unsigned char> p2(addr_bytes2, addr_bytes2 + 20);
+    // std::vector<unsigned char> s2(sk_bytes2, sk_bytes2 + 32);
 
-    accounts.insert(map_account_value(p, Account(s)));
-    accounts.insert(map_account_value(p2, Account(s2)));
+    // accounts.insert(map_account_value(p, Account(s)));
+    // accounts.insert(map_account_value(p2, Account(s2)));
     /********************************************************/
 
 
@@ -61,41 +61,41 @@ void ecall_store_account_data()
 void ecall_store_channel_data()
 {
     /********************** test dummy **********************/
-    unsigned char *my_addr, *other_addr;
-    Channel channel1, channel2;
+    // unsigned char *my_addr, *other_addr;
+    // Channel channel1, channel2;
 
-    my_addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
-    other_addr = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
+    // my_addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
+    // other_addr = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
 
-    channel1.m_id = 8;
-    channel1.m_is_in = 1;
+    // channel1.m_id = 8;
+    // channel1.m_is_in = 1;
 
-    channel1.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
+    // channel1.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
 
-    channel1.m_my_addr = ::arr_to_bytes(my_addr, 40);
-    channel1.m_my_deposit = 0;
-    channel1.m_other_deposit = 90;
-    channel1.m_balance = 30;
-    channel1.m_locked_balance = 0;
-    channel1.m_other_addr = ::arr_to_bytes(other_addr, 40);
+    // channel1.m_my_addr = ::arr_to_bytes(my_addr, 40);
+    // channel1.m_my_deposit = 0;
+    // channel1.m_other_deposit = 90;
+    // channel1.m_balance = 30;
+    // channel1.m_locked_balance = 0;
+    // channel1.m_other_addr = ::arr_to_bytes(other_addr, 40);
 
-    my_addr = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
-    other_addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
+    // my_addr = (unsigned char*)"83360d654B353Ca46342257D3e0eaC761cDEAc75";
+    // other_addr = (unsigned char*)"95809420428B4D972F6Cf2d5ab3F23ADA7039488";
 
-    channel2.m_id = 12;
-    channel2.m_is_in = 0;
+    // channel2.m_id = 12;
+    // channel2.m_is_in = 0;
 
-    channel2.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
+    // channel2.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
 
-    channel2.m_my_addr = ::arr_to_bytes(my_addr, 40);
-    channel2.m_my_deposit = 70;
-    channel2.m_other_deposit = 0;
-    channel2.m_balance = 50;
-    channel2.m_locked_balance = 0;
-    channel2.m_other_addr = ::arr_to_bytes(other_addr, 40);
+    // channel2.m_my_addr = ::arr_to_bytes(my_addr, 40);
+    // channel2.m_my_deposit = 70;
+    // channel2.m_other_deposit = 0;
+    // channel2.m_balance = 50;
+    // channel2.m_locked_balance = 0;
+    // channel2.m_other_addr = ::arr_to_bytes(other_addr, 40);
 
-    channels.insert(map_channel_value(8, channel1));
-    channels.insert(map_channel_value(12, channel2));
+    // channels.insert(map_channel_value(8, channel1));
+    // channels.insert(map_channel_value(12, channel2));
     /********************************************************/
 
 
