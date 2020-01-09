@@ -189,8 +189,8 @@ int SGX_CDECL main(int argc, char *argv[])
 
     /* loading channel information */
 
-    ecall_load_channel_data_w(9, 0, 0, owner, 88, 0, 80, 0, B, (unsigned char *)"127.0.0.3", 7878);
-    printf("CHANNEL 9 BALANCE: %d\n", ecall_get_balance_w(9));
+    //ecall_load_channel_data_w(9, 0, 0, owner, 88, 0, 80, 0, B, (unsigned char *)"127.0.0.3", 7878);
+    //printf("CHANNEL 9 BALANCE: %d\n", ecall_get_balance_w(9));
 
     /* =============== test =============== */
 
