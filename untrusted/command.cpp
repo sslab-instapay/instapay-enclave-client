@@ -80,6 +80,16 @@ unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *
 }
 
 
+unsigned int ecall_get_num_open_channels_w(void)
+{
+    unsigned int num_open_channels;
+
+    ecall_get_num_open_channels(global_eid, &num_open_channels);
+
+    return num_open_channels;
+}
+
+
 void* ecall_get_open_channels_w(void)
 {
     unsigned char *open_channels;
@@ -94,6 +104,16 @@ void* ecall_get_open_channels_w(void)
 }
 
 
+unsigned int ecall_get_num_closed_channels_w(void)
+{
+    unsigned int num_closed_channels;
+
+    ecall_get_num_closed_channels(global_eid, &num_closed_channels);
+
+    return num_closed_channels;
+}
+
+
 void* ecall_get_closed_channels_w(void)
 {
     unsigned char *closed_channels;
@@ -105,6 +125,16 @@ void* ecall_get_closed_channels_w(void)
     ecall_get_open_channels(global_eid, closed_channels);
 
     return closed_channels;
+}
+
+
+unsigned int ecall_get_num_public_addrs_w(void)
+{
+    unsigned int num_public_addrs;
+
+    ecall_get_num_closed_channels(global_eid, &num_public_addrs);
+
+    return num_public_addrs;
 }
 
 

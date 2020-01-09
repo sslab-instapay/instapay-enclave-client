@@ -62,8 +62,11 @@ int ecall_get_balance_w(unsigned int channel_id);
 unsigned char* ecall_close_channel_w(unsigned int nonce, unsigned int channel_id, unsigned int *sig_len);
 unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *sig_len);
 
+unsigned int ecall_get_num_open_channels_w(void);
 void* ecall_get_open_channels_w(void);
+unsigned int ecall_get_num_closed_channels_w(void);
 void* ecall_get_closed_channels_w(void);
+unsigned int ecall_get_num_public_addrs_w(void);
 void* ecall_get_public_addrs_w(void);
 
 /* network.cpp */
