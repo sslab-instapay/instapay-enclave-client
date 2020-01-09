@@ -9,6 +9,7 @@ enum channel_status {
 	IDLE		= 1,
 	PRE_UPDATE	= 2,
 	POST_UPDATE	= 3,
+    CLOSED      = 4,
 };
 
 
