@@ -126,13 +126,14 @@ enclave {
             [user_check] unsigned char *output);
 
         public void ecall_go_post_update(
-            unsigned int payment_num,
-            [user_check] unsigned int *channel_id,
-            [user_check] int *amount,
-            unsigned int size);
+            [user_check] unsigned char *msg,
+            [user_check] unsigned char *signature,
+            [user_check] unsigned char *original_msg, 
+            [user_check] unsigned char *output);
 
         public void ecall_go_idle(
-            unsigned int payment_num);
+            [user_check] unsigned char *msg,
+            [user_check] unsigned char *signature);
 
         public void ecall_register_comminfo(
             unsigned int channel_id,

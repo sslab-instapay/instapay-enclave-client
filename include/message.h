@@ -4,7 +4,7 @@
 #include <vector>
 #include <util.h>
 
-#define SERVER_PUBADDR  "7e58a6de07fa27d93716a77c369a1ab07f9d1682"
+#define SERVER_PUBADDR  (unsigned char*)"7e58a6de07fa27d93716a77c369a1ab07f9d1682"
 
 #if defined(__cplusplus)
 extern "C" {

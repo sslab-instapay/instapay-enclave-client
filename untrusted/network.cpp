@@ -9,22 +9,28 @@ void ecall_go_pre_update_w(unsigned char *msg, unsigned char *signature, unsigne
     unsigned char *reply_msg = new unsigned char[sizeof(message)];
     unsigned char *reply_sig = new unsigned char[65];
 
-    // ecall_go_pre_update(global_eid, msg, signature, reply_msg, reply_sig);
+    ecall_go_pre_update(global_eid, msg, signature, reply_msg, reply_sig);
 
-    // *original_msg = reply_msg;
-    // *output = reply_sig;
+    *original_msg = reply_msg;
+    *output = reply_sig;
 }
 
 
-void ecall_go_post_update_w(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size)
+void ecall_go_post_update_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output)
 {
-    ecall_go_post_update(global_eid, payment_num, channel_id, amount, size);
+    unsigned char *reply_msg = new unsigned char[sizeof(message)];
+    unsigned char *reply_sig = new unsigned char[65];
+
+    ecall_go_post_update(global_eid, msg, signature, reply_msg, reply_sig);
+
+    *original_msg = reply_msg;
+    *output = reply_sig;
 }
 
 
-void ecall_go_idle_w(unsigned int payment_num)
+void ecall_go_post_update_w(unsigned char *msg, unsigned char *signature)
 {
-    ecall_go_idle(global_eid, payment_num);
+    ecall_go_idle(global_eid, msg, signature);    
 }
 
 

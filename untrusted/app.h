@@ -107,8 +107,8 @@ void ecall_test_func_w(void);
 
 /* network.cpp */
 void ecall_go_pre_update_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output);
-void ecall_go_post_update_w(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size);
-void ecall_go_idle_w(unsigned int payment_num);
+void ecall_go_post_update_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output);
+void ecall_go_idle_w(unsigned char *msg, unsigned char *signature);
 void ecall_register_comminfo_w(unsigned int channel_id, unsigned char *ip, unsigned int port);
 
 /* event.cpp */
