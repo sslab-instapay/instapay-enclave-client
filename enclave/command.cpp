@@ -599,38 +599,38 @@ void ecall_test_func(void)
 
     /******************* channel setting *******************/
 
-    unsigned char *my_addr, *other_addr;
-    Channel channel1;
+    // unsigned char *my_addr, *other_addr;
+    // Channel channel1;
 
-    my_addr = (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e";
-    other_addr = (unsigned char*)"0b4161ad4f49781a821c308d672e6c669139843c";
+    // my_addr = (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e";
+    // other_addr = (unsigned char*)"0b4161ad4f49781a821c308d672e6c669139843c";
 
-    channel1.m_id = 8;
-    channel1.m_is_in = 1;
+    // channel1.m_id = 8;
+    // channel1.m_is_in = 1;
 
-    channel1.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
+    // channel1.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
 
-    channel1.m_my_addr = ::arr_to_bytes(my_addr, 40);
-    channel1.m_my_deposit = 0;
-    channel1.m_other_deposit = 90;
-    channel1.m_balance = 30;
-    channel1.m_locked_balance = 0;
-    channel1.m_other_addr = ::arr_to_bytes(other_addr, 40);
+    // channel1.m_my_addr = ::arr_to_bytes(my_addr, 40);
+    // channel1.m_my_deposit = 0;
+    // channel1.m_other_deposit = 90;
+    // channel1.m_balance = 30;
+    // channel1.m_locked_balance = 0;
+    // channel1.m_other_addr = ::arr_to_bytes(other_addr, 40);
 
-    channels.insert(map_channel_value(8, channel1));
+    // channels.insert(map_channel_value(8, channel1));
 
-    /******************* account setting *******************/
+    // /******************* account setting *******************/
 
-    unsigned char* paddr = (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e";
-    unsigned char* sk = (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd";
+    // unsigned char* paddr = (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e";
+    // unsigned char* sk = (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd";
 
-    paddr = ::arr_to_bytes(paddr, 40);
-    sk = ::arr_to_bytes(sk, 64);
+    // paddr = ::arr_to_bytes(paddr, 40);
+    // sk = ::arr_to_bytes(sk, 64);
 
-    std::vector<unsigned char> p(paddr, paddr + 20);
-    std::vector<unsigned char> s(sk, sk + 32);
+    // std::vector<unsigned char> p(paddr, paddr + 20);
+    // std::vector<unsigned char> s(sk, sk + 32);
 
-    accounts.insert(map_account_value(p, Account(s)));
+    // accounts.insert(map_account_value(p, Account(s)));
 
     /*******************************************************/
 
