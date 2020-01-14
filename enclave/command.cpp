@@ -200,7 +200,7 @@ void ecall_paid(unsigned char *msg, unsigned char *signature, unsigned char *ori
 
     /* step 1. verify signature */
 
-    if(verify_message(0, signature, msg, sizeof(Message), (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e"))   // other_addr
+    if(verify_message(0, signature, msg, sizeof(Message), other_addr))
         return;
 
     /* step 2. check that message type is 'PAY' */
@@ -251,7 +251,7 @@ void ecall_pay_accepted(unsigned char *msg, unsigned char *signature)
 
     /* step 1. verify signature */
 
-    if(verify_message(0, signature, msg, sizeof(Message), (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e"))  // my_addr
+    if(verify_message(0, signature, msg, sizeof(Message), my_addr))
         return;
 
     /* step 2. check that message type is 'PAY' */
