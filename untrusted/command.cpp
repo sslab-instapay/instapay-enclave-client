@@ -46,6 +46,39 @@ unsigned char* ecall_onchain_payment_w(unsigned int nonce, unsigned char *owner,
     return signed_tx;
 }
 
+unsigned int ecall_pay_w(unsigned int channel_id, unsigned int amount, unsigned char **original_msg, unsigned char **output)
+{
+    unsigned char *msg = new unsigned char[sizeof(message)];
+    unsigned char *signature = new unsigned char[65];
+
+    int is_success;
+
+    memset(msg, 0x00, sizeof(message));
+
+    ecall_pay(global_eid, channel_id, amount, &is_success, msg, signature);
+    *original_msg = msg;
+    *output = signature;
+
+    return is_success;
+}
+
+void ecall_paid_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output)
+{
+    unsigned char *reply_msg = new unsigned char[sizeof(message)];
+    unsigned char *reply_sig = new unsigned char[65];
+
+    memset(reply_msg, 0x00, sizeof(message));
+
+    ecall_paid(global_eid, msg, signature, reply_msg, reply_sig);
+    *original_msg = reply_msg;
+    *output = reply_sig;
+}
+
+void ecall_pay_accepted_w(unsigned char *msg, unsigned char *signature)
+{
+    ecall_pay_accepted(global_eid, msg, signature);
+}
+
 int ecall_get_balance_w(unsigned int channel_id)
 {
     unsigned int balance;
@@ -149,4 +182,10 @@ void* ecall_get_public_addrs_w(void)
     ecall_get_public_addrs(global_eid, public_addrs);
 
     return public_addrs;
+}
+
+
+void ecall_test_func_w(void)
+{
+    ecall_test_func(global_eid);
 }

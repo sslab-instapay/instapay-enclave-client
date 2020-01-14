@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 
-typedef struct _channel
+typedef struct _channel   // channel.h
 {
     unsigned int m_id;
     unsigned int m_is_in;
@@ -43,21 +43,54 @@ typedef struct _channel
 } channel;
 
 
-typedef struct _address
+typedef struct _address   // account.h
 {
     unsigned char addr[20];
 } address;
+
+
+enum message_type {
+	PAY     = 0,
+    PAID    = 1,
+    PM_REQ  = 2,
+    AG_REQ  = 3,
+    AG_RES  = 4,
+    UD_REQ  = 5,
+    UD_RES  = 6,
+    CONFIRM = 7,    
+};
+
+typedef struct _message {
+    /********* common *********/
+    unsigned int type;
+
+    /***** direct payment *****/
+    unsigned int channel_id;
+    int amount;
+    unsigned int counter;
+
+    /*** multi-hop payment ****/
+    unsigned int payment_num;
+    unsigned int payment_size;
+    unsigned int channel_ids[2];
+    int payment_amount[2];
+    unsigned int e;
+} message;
 
 
 int initialize_enclave(void);
 
 /* command.cpp */
 void ecall_preset_account_w(unsigned char *addr, unsigned char *seckey);    /* for debugging (you must remove it for product) */
-//void ecall_preset_channel_w();  /* for debugging (you must remove it for product) */
 void ecall_preset_payment_w(unsigned int pn, unsigned int channel_id, int amount);    /* for debugging (you must remove it for product) */
 unsigned char* ecall_create_account_w(void);
 unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int deposit, unsigned int *sig_len);
 unsigned char* ecall_onchain_payment_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int amount, unsigned int *sig_len);
+
+unsigned int ecall_pay_w(unsigned int channel_id, unsigned int amount, unsigned char **original_msg, unsigned char **output);
+void ecall_paid_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output);
+void ecall_pay_accepted_w(unsigned char *msg, unsigned char *signature);
+
 int ecall_get_balance_w(unsigned int channel_id);
 unsigned char* ecall_close_channel_w(unsigned int nonce, unsigned int channel_id, unsigned int *sig_len);
 unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *sig_len);
@@ -69,8 +102,11 @@ void* ecall_get_closed_channels_w(void);
 unsigned int ecall_get_num_public_addrs_w(void);
 void* ecall_get_public_addrs_w(void);
 
+/* test for code snippet */
+void ecall_test_func_w(void);
+
 /* network.cpp */
-void ecall_go_pre_update_w(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size);
+void ecall_go_pre_update_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output);
 void ecall_go_post_update_w(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size);
 void ecall_go_idle_w(unsigned int payment_num);
 void ecall_register_comminfo_w(unsigned int channel_id, unsigned char *ip, unsigned int port);
@@ -86,6 +122,7 @@ void ecall_store_channel_data_w(void);
 /* load.cpp */
 void ecall_load_account_data_w(void);
 void ecall_load_channel_data_w(void);
+
 
 #if defined(__cplusplus)
 }

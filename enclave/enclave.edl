@@ -52,7 +52,19 @@ enclave {
         public void ecall_pay(
             unsigned int channel_id,
             unsigned int amount,
-            [user_check] int *is_success);
+            [user_check] int *is_success,
+            [user_check] unsigned char *original_msg,
+            [user_check] unsigned char *output);
+
+        public void ecall_paid(
+            [user_check] unsigned char *msg,
+            [user_check] unsigned char *signature,
+            [user_check] unsigned char *original_msg, 
+            [user_check] unsigned char *output);
+
+        public void ecall_pay_accepted(
+            [user_check] unsigned char *msg,
+            [user_check] unsigned char *signature);
 
         public void ecall_get_balance(
             unsigned int channel_id,
@@ -88,6 +100,8 @@ enclave {
         public void ecall_get_public_addrs(
             [user_check] unsigned char *public_addrs);
 
+        public void ecall_test_func(void);
+
 
         /* event */
 
@@ -106,10 +120,10 @@ enclave {
         /* network */
 
         public void ecall_go_pre_update(
-            unsigned int payment_num,
-            [user_check] unsigned int *channel_id,
-            [user_check] int *amount,
-            unsigned int size);
+            [user_check] unsigned char *msg,
+            [user_check] unsigned char *signature,
+            [user_check] unsigned char *original_msg, 
+            [user_check] unsigned char *output);
 
         public void ecall_go_post_update(
             unsigned int payment_num,

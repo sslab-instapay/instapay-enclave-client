@@ -31,7 +31,7 @@ typedef struct _channel
 
 class Channel {
     public:
-        Channel() {};
+        Channel() {m_counter = 0;};
         Channel(unsigned int t_id,
                 unsigned char *t_my_addr,
                 unsigned char *t_other_addr,
@@ -58,6 +58,8 @@ class Channel {
                 m_balance = t_deposit;
                 m_locked_balance = 0;
             }
+
+            m_counter = 0;
         };
 
         int pay(unsigned int amount);
@@ -81,6 +83,8 @@ class Channel {
         unsigned char *m_other_addr;
         unsigned char *m_other_ip;
         unsigned int m_other_port;
+
+        unsigned int m_counter;
 };
 
 using namespace std;

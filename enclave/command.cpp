@@ -12,6 +12,7 @@
 #include <channel.h>
 #include <payment.h>
 #include <transaction.h>
+#include <message.h>
 #include <util.h>
 
 
@@ -134,15 +135,131 @@ void ecall_onchain_payment(unsigned int nonce, unsigned char *owner, unsigned ch
 }
 
 
-void ecall_pay(unsigned int channel_id, unsigned int amount, int *is_success)
+void ecall_pay(unsigned int channel_id, unsigned int amount, int *is_success, unsigned char *original_msg, unsigned char *output)
 {
+    unsigned char signature[65] = {0, };
+    unsigned char *my_addr = channels.find(channel_id)->second.m_my_addr;
+
+    int rand_num;
+
+    Message msg;
+    std::vector<unsigned char> pubkey(my_addr, my_addr + 20);
+    std::vector<unsigned char> seckey;
+
+    memset((unsigned char*)&msg, 0x00, sizeof(Message));
+
     if(channels.find(channel_id) == channels.end()) {
         *is_success = false;
         return;
     }
 
-    *is_success = channels.find(channel_id)->second.pay(amount);
+    if(channels.find(channel_id)->second.m_balance < amount) {
+        *is_success = false;
+        return;
+    }
+
+    if(channels.find(channel_id)->second.m_balance - channels.find(channel_id)->second.m_locked_balance < amount) {
+        *is_success = false;
+        return;
+    }
+
+    if(channels.find(channel_id)->second.m_counter == 0) {
+        sgx_read_rand((unsigned char*)&rand_num, 4);
+        channels.find(channel_id)->second.m_counter = rand_num;
+    }
+
+    *is_success = true;
+    msg.type = PAY;
+    msg.channel_id = channel_id;
+    msg.amount = amount;
+    msg.counter = channels.find(channel_id)->second.m_counter;
+    seckey = accounts.find(pubkey)->second.get_seckey();
+
+    sign_message((unsigned char*)&msg, sizeof(Message), (unsigned char*)seckey.data(), signature);
+
+    memcpy(original_msg, (unsigned char*)&msg, sizeof(Message));
+    memcpy(output, signature, 65);
+
     return;
+}
+
+
+void ecall_paid(unsigned char *msg, unsigned char *signature, unsigned char *original_msg, unsigned char *output)
+{
+    Message *direct_payment = (Message*)msg;
+    Message reply;
+
+    unsigned char reply_signature[65] = {0, };
+    unsigned char *other_addr = channels.find(direct_payment->channel_id)->second.m_other_addr;
+    unsigned char *my_addr = channels.find(direct_payment->channel_id)->second.m_my_addr;
+
+    std::vector<unsigned char> pubkey(my_addr, my_addr + 20);
+    std::vector<unsigned char> seckey;
+
+    memset((unsigned char*)&reply, 0x00, sizeof(Message));
+
+    /* step 1. verify signature */
+
+    if(verify_message(0, signature, msg, sizeof(Message), (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e"))   // other_addr
+        return;
+
+    /* step 2. check that message type is 'PAY' */
+
+    if(direct_payment->type != PAY)
+        return;
+
+    if(channels.find(direct_payment->channel_id) == channels.end()) {
+        return;
+    }
+
+    /* step 3. verify the counter */
+
+    if(channels.find(direct_payment->channel_id)->second.m_counter == 0) {
+        channels.find(direct_payment->channel_id)->second.m_counter = direct_payment->counter;
+    }
+    else if(channels.find(direct_payment->channel_id)->second.m_counter + 1 == direct_payment->counter){
+        (channels.find(direct_payment->channel_id)->second.m_counter)++;
+    }
+    else {
+        return;
+    }
+
+    /* step 4. apply balance change */
+
+    channels.find(direct_payment->channel_id)->second.paid(direct_payment->amount);
+
+    /* step 5. generate reply message */
+
+    reply.type = PAID;
+    reply.channel_id = direct_payment->channel_id;
+    reply.amount = direct_payment->amount;
+    seckey = accounts.find(pubkey)->second.get_seckey();
+
+    sign_message((unsigned char*)&reply, sizeof(Message), (unsigned char*)seckey.data(), reply_signature);
+
+    memcpy(original_msg, (unsigned char*)&reply, sizeof(Message));
+    memcpy(output, reply_signature, 65);
+
+    return;
+}
+
+
+void ecall_pay_accepted(unsigned char *msg, unsigned char *signature)
+{
+    Message *reply_msg = (Message*)msg;
+    unsigned char *my_addr = channels.find(reply_msg->channel_id)->second.m_my_addr;
+
+    /* step 1. verify signature */
+
+    if(verify_message(0, signature, msg, sizeof(Message), (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e"))  // my_addr
+        return;
+
+    /* step 2. check that message type is 'PAY' */
+
+    if(reply_msg->type != PAID)
+        return;
+
+    channels.find(reply_msg->channel_id)->second.pay(reply_msg->amount);
 }
 
 
@@ -452,4 +569,82 @@ void ecall_get_public_addrs(unsigned char *public_addrs)
         memcpy(public_addrs + cursor, (unsigned char*)&data, sizeof(address));
         cursor += sizeof(address);
     }
+}
+
+
+void ecall_test_func(void)
+{
+    // unsigned char *original_msg = (unsigned char*)"FUCKYOU";
+    // unsigned int msg_size = 7;
+    // unsigned char *seckey = (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd";
+    // unsigned char signature[65];
+
+    // // DirectPayment dp;
+
+    // sign_message(original_msg, msg_size, seckey, signature);
+
+    // printf("r: ");
+    // for(int i = 0; i < 32; i++)
+    //     printf("%02x", signature[i]);
+    // printf("\n");
+
+    // printf("s: ");
+    // for(int i = 32; i < 64; i++)
+    //     printf("%02x", signature[i]);
+    // printf("\n");
+
+    // int is_same = verify_message(signature, original_msg, msg_size, (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e");
+    // printf("IS SAME ? : %d\n", is_same);
+
+
+    /******************* channel setting *******************/
+
+    unsigned char *my_addr, *other_addr;
+    Channel channel1;
+
+    my_addr = (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e";
+    other_addr = (unsigned char*)"0b4161ad4f49781a821c308d672e6c669139843c";
+
+    channel1.m_id = 8;
+    channel1.m_is_in = 1;
+
+    channel1.m_status = POST_UPDATE;    // PENDING, IDLE, PRE_UPDATE, POST_UPDATE
+
+    channel1.m_my_addr = ::arr_to_bytes(my_addr, 40);
+    channel1.m_my_deposit = 0;
+    channel1.m_other_deposit = 90;
+    channel1.m_balance = 30;
+    channel1.m_locked_balance = 0;
+    channel1.m_other_addr = ::arr_to_bytes(other_addr, 40);
+
+    channels.insert(map_channel_value(8, channel1));
+
+    /******************* account setting *******************/
+
+    unsigned char* paddr = (unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e";
+    unsigned char* sk = (unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd";
+
+    paddr = ::arr_to_bytes(paddr, 40);
+    sk = ::arr_to_bytes(sk, 64);
+
+    std::vector<unsigned char> p(paddr, paddr + 20);
+    std::vector<unsigned char> s(sk, sk + 32);
+
+    accounts.insert(map_account_value(p, Account(s)));
+
+    /*******************************************************/
+
+    // unsigned char signature[65] = {0, };
+    // unsigned char reply_signature[65] = {0, };
+    // int is_success;
+
+    // Message msg, reply_msg;
+
+    // ecall_pay(8, 10, &is_success, (unsigned char*)&msg, signature);
+    // ecall_paid((unsigned char*)&msg, signature, (unsigned char*)&reply_msg, reply_signature);
+    // ecall_pay_accepted((unsigned char*)&reply_msg, reply_signature);
+
+    // printf("msg.type: %d\n", reply_msg.type);
+    // printf("msg.channel_id: %d\n", reply_msg.channel_id);
+    // printf("msg.amount: %d\n", reply_msg.amount);
 }

@@ -172,20 +172,20 @@ int SGX_CDECL main(int argc, char *argv[])
                      id: 2                   id: 3
         A(0x7890...) -----> owner(0xd03a...) -----> B(0x0b41...)
     */
-    ecall_receive_create_channel_w(2, A, owner, 5);
-    ecall_receive_create_channel_w(3, owner, B, 9);
-    printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", ecall_get_balance_w(2));
-    printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", ecall_get_balance_w(3));
+    // ecall_receive_create_channel_w(2, A, owner, 5);
+    // ecall_receive_create_channel_w(3, owner, B, 9);
+    // printf("[BEFORE] CHANNEL 2 BALANCE: %d\n", ecall_get_balance_w(2));
+    // printf("[BEFORE] CHANNEL 3 BALANCE: %d\n", ecall_get_balance_w(3));
 
-    unsigned int channel_id[2] = {2, 3};
-    int amount[2] = {4, -4};
+    // unsigned int channel_id[2] = {2, 3};
+    // int amount[2] = {4, -4};
 
-    ecall_go_pre_update_w(10, channel_id, amount, 2);
-    ecall_go_post_update_w(10, channel_id, amount, 2);
-    ecall_go_idle_w(10);
+    // ecall_go_pre_update_w(10, channel_id, amount, 2);
+    // ecall_go_post_update_w(10, channel_id, amount, 2);
+    // ecall_go_idle_w(10);
 
-    printf("[AFTER] CHANNEL 2 BALANCE: %d\n", ecall_get_balance_w(2));
-    printf("[AFTER] CHANNEL 3 BALANCE: %d\n", ecall_get_balance_w(3));
+    // printf("[AFTER] CHANNEL 2 BALANCE: %d\n", ecall_get_balance_w(2));
+    // printf("[AFTER] CHANNEL 3 BALANCE: %d\n", ecall_get_balance_w(3));
 
     /* loading channel information */
 

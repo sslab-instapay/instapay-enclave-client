@@ -16,17 +16,22 @@
 using namespace std;
 
 
-void ecall_go_pre_update(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size)
+// void ecall_go_pre_update(unsigned int payment_num, unsigned int *channel_id, int *amount, unsigned int size)
+// {
+//     payments.insert(map_payment_value(payment_num, Payment(payment_num)));
+
+//     for(int i = 0; i < size; i++) {
+//         payments.find(payment_num)->second.add_element(channel_id[i], amount[i]);
+//         channels.find(channel_id[i])->second.transition_to_pre_update();
+//         channels.find(channel_id[i])->second.m_locked_balance -= amount[i];
+//     }
+
+//     return;
+// }
+
+void ecall_go_pre_update(unsigned char *msg, unsigned char *signature, unsigned char *original_msg, unsigned char *output)
 {
-    payments.insert(map_payment_value(payment_num, Payment(payment_num)));
 
-    for(int i = 0; i < size; i++) {
-        payments.find(payment_num)->second.add_element(channel_id[i], amount[i]);
-        channels.find(channel_id[i])->second.transition_to_pre_update();
-        channels.find(channel_id[i])->second.m_locked_balance -= amount[i];
-    }
-
-    return;
 }
 
 

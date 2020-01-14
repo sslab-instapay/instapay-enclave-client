@@ -3,10 +3,6 @@
 
 int Channel::pay(unsigned int amount)
 {
-    if(m_balance - m_locked_balance < amount) {
-        return false;
-    }
-
     m_balance -= amount;
     return true;
 }
