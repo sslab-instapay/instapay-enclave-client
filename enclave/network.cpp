@@ -31,8 +31,17 @@ void ecall_go_pre_update(unsigned char *msg, unsigned char *signature, unsigned 
 
     memset((unsigned char*)&reply, 0x00, sizeof(Message));
 
-    /* step 1. verify signature */
+    printf("[FROM SERVER] msg: ");
+    for(int i = 0; i < 44; i++)
+        printf("%02x", msg[i]);
+    printf("\n");
 
+    printf("[FROM SERVER] sig: ");
+    for(int i = 0; i < 65; i++)
+        printf("%02x", signature[i]);
+    printf("\n");
+
+    /* step 1. verify signature */
     if(verify_message(1, signature, msg, sizeof(Message), NULL))
         return;
 
@@ -47,6 +56,11 @@ void ecall_go_pre_update(unsigned char *msg, unsigned char *signature, unsigned 
     payment_size = ag_req->payment_size;
     channel_ids = ag_req->channel_ids;
     payment_amount = ag_req->payment_amount;
+
+    printf("channel ids: ");
+    for(int i = 0; i < payment_size; i++)
+        printf("[%d] ", channel_ids[i]);
+    printf("\n");
 
     payments.insert(map_payment_value(payment_num, Payment(payment_num)));
 

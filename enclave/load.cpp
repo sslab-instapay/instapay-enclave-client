@@ -76,6 +76,7 @@ void ecall_load_channel_data(unsigned char *sealed_channel_data)
     ch.m_locked_balance = unsealed_channel_data.m_locked_balance;
 
     ch.m_other_addr = ::copy_bytes(unsealed_channel_data.m_other_addr, 20);
+    ch.m_counter = 0;
 
     channels.insert(map_channel_value(ch.m_id, ch));
 

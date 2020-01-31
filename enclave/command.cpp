@@ -107,9 +107,13 @@ void ecall_create_channel(unsigned int nonce, unsigned char *owner, unsigned cha
     /* generate a transaction creating a channel */
     Transaction tx(nonce, CONTRACT_ADDR, deposit, data.data(), data.size());
 
-    // TODO: find the account's private key and sign on transaction using
+    // find the account's private key and sign on transaction using
+    addr = ::arr_to_bytes(owner, 40);
+    std::vector<unsigned char> pubkey(addr, addr + 20);
+    std::vector<unsigned char> seckey;
 
-    tx.sign((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd");
+    seckey = accounts.find(pubkey)->second.get_seckey();
+    tx.sign((unsigned char*)seckey.data());  // "e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd"
 
     memcpy(signed_tx, tx.signed_tx.data(), tx.signed_tx.size());
     *signed_tx_len = tx.signed_tx.size();
@@ -119,14 +123,15 @@ void ecall_create_channel(unsigned int nonce, unsigned char *owner, unsigned cha
 
 void ecall_onchain_payment(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int amount, unsigned char *signed_tx, unsigned int *signed_tx_len)
 {
-    /* encode ABI for calling "create_channel(address)" on the contract */
-    sha3_context sha3_ctx;
-
-    /* generate a transaction creating a channel */
     Transaction tx(nonce, receiver, amount, NULL, 0);
 
-    // TODO: find the account's private key and sign on transaction using
-    tx.sign((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd");
+    // find the account's private key and sign on transaction using
+    unsigned char *addr = ::arr_to_bytes(owner, 40);
+    std::vector<unsigned char> pubkey(addr, addr + 20);
+    std::vector<unsigned char> seckey;
+
+    seckey = accounts.find(pubkey)->second.get_seckey();
+    tx.sign((unsigned char*)seckey.data());
 
     memcpy(signed_tx, tx.signed_tx.data(), tx.signed_tx.size());
     *signed_tx_len = tx.signed_tx.size();
@@ -163,10 +168,10 @@ void ecall_pay(unsigned int channel_id, unsigned int amount, int *is_success, un
         return;
     }
 
-    if(channels.find(channel_id)->second.m_counter == 0) {
-        sgx_read_rand((unsigned char*)&rand_num, 4);
-        channels.find(channel_id)->second.m_counter = rand_num;
-    }
+    // if(channels.find(channel_id)->second.m_counter == 0) {
+    //     sgx_read_rand((unsigned char*)&rand_num, 4);
+    //     channels.find(channel_id)->second.m_counter = rand_num;
+    // }
 
     *is_success = true;
     msg.type = PAY;
@@ -200,29 +205,35 @@ void ecall_paid(unsigned char *msg, unsigned char *signature, unsigned char *ori
 
     /* step 1. verify signature */
 
-    if(verify_message(0, signature, msg, sizeof(Message), other_addr))
+    if(verify_message(0, signature, msg, sizeof(Message), other_addr)) {    // other_addr
+        printf("ERROR: fail to verify message\n");
         return;
+    }
 
     /* step 2. check that message type is 'PAY' */
 
-    if(direct_payment->type != PAY)
+    if(direct_payment->type != PAY) {
+        printf("ERROR: type is not \'PAY\'\n");
         return;
+    }
 
     if(channels.find(direct_payment->channel_id) == channels.end()) {
+        printf("ERROR: there is no channel %d\n", direct_payment->channel_id);
         return;
     }
 
     /* step 3. verify the counter */
 
-    if(channels.find(direct_payment->channel_id)->second.m_counter == 0) {
-        channels.find(direct_payment->channel_id)->second.m_counter = direct_payment->counter;
-    }
-    else if(channels.find(direct_payment->channel_id)->second.m_counter + 1 == direct_payment->counter){
-        (channels.find(direct_payment->channel_id)->second.m_counter)++;
-    }
-    else {
-        return;
-    }
+    // if(channels.find(direct_payment->channel_id)->second.m_counter == 0) {
+    //     channels.find(direct_payment->channel_id)->second.m_counter = direct_payment->counter;
+    // }
+    // else if(channels.find(direct_payment->channel_id)->second.m_counter + 1 == direct_payment->counter){
+    //     (channels.find(direct_payment->channel_id)->second.m_counter)++;
+    // }
+    // else {
+    //     printf("ERROR: counter is invalid\n");
+    //     return;
+    // }
 
     /* step 4. apply balance change */
 
@@ -248,13 +259,21 @@ void ecall_pay_accepted(unsigned char *msg, unsigned char *signature)
 {
     Message *reply_msg = (Message*)msg;
     unsigned char *my_addr = channels.find(reply_msg->channel_id)->second.m_my_addr;
+    unsigned char *other_addr = channels.find(reply_msg->channel_id)->second.m_other_addr;
+
+    // printf("========= IN ecall_pay_accepted ========\n");
+    // printf("other addr: ");
+    // for(int i = 0; i < 20; i++)
+    //     printf("%02x", other_addr[i]);
+    // printf("\n");
+    // printf("========================================\n");
 
     /* step 1. verify signature */
 
-    if(verify_message(0, signature, msg, sizeof(Message), my_addr))
+    if(verify_message(0, signature, msg, sizeof(Message), other_addr))
         return;
 
-    /* step 2. check that message type is 'PAY' */
+    /* step 2. check that message type is 'PAID' */
 
     if(reply_msg->type != PAID)
         return;
@@ -267,6 +286,30 @@ void ecall_get_balance(unsigned int channel_id, unsigned int *balance)
 {
     *balance = channels.find(channel_id)->second.get_balance();
     return;
+}
+
+
+void ecall_get_channel_info(unsigned int channel_id, unsigned char *channel_info)
+{
+    channel ch_struct;
+    Channel ch;
+
+    if(channels.find(channel_id) == channels.end())
+        return;
+
+    ch = channels.find(channel_id)->second;
+
+    ch_struct.m_id = ch.m_id;
+    ch_struct.m_is_in = ch.m_is_in;
+    ch_struct.m_status = ch.m_status;
+    memcpy(ch_struct.m_my_addr, ch.m_my_addr, 20);
+    ch_struct.m_my_deposit = ch.m_my_deposit;
+    ch_struct.m_other_deposit = ch.m_other_deposit;
+    ch_struct.m_balance = ch.m_balance;
+    ch_struct.m_locked_balance = ch.m_locked_balance;
+    memcpy(ch_struct.m_other_addr, ch.m_other_addr, 20);
+
+    memcpy((void*)channel_info, (void*)&ch_struct, sizeof(channel));
 }
 
 
@@ -315,9 +358,13 @@ void ecall_close_channel(unsigned int nonce, unsigned int channel_id, unsigned c
     /* generate a transaction creating a channel */
     Transaction tx(nonce, CONTRACT_ADDR, 0, data.data(), data.size());
 
-    // TODO: find the account's private key and sign on transaction using
+    // find the account's private key and sign on transaction using
+    unsigned char *addr = channels.find(channel_id)->second.m_my_addr;
+    addr = ::arr_to_bytes(addr, 40);
+    std::vector<unsigned char> pubkey(addr, addr + 20);
+    std::vector<unsigned char> seckey = accounts.find(pubkey)->second.get_seckey();
 
-    tx.sign((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd");
+    tx.sign((unsigned char*)seckey.data());
 
     memcpy(signed_tx, tx.signed_tx.data(), tx.signed_tx.size());
     *signed_tx_len = tx.signed_tx.size();
@@ -412,12 +459,15 @@ void ecall_eject(unsigned int nonce, unsigned int pn, unsigned char *signed_tx, 
     }
 
 
-    /* generate a transaction creating a channel */
     Transaction tx(nonce, CONTRACT_ADDR, 0, data.data(), data.size());
 
-    // TODO: find the account's private key and sign on transaction using
+    // find the account's private key and sign on transaction using
+    unsigned char *addr = channels.find(e)->second.m_my_addr;
+    addr = ::arr_to_bytes(addr, 40);
+    std::vector<unsigned char> pubkey(addr, addr + 20);
+    std::vector<unsigned char> seckey = accounts.find(pubkey)->second.get_seckey();
 
-    tx.sign((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd");
+    tx.sign((unsigned char*)seckey.data());
 
     memcpy(signed_tx, tx.signed_tx.data(), tx.signed_tx.size());
     *signed_tx_len = tx.signed_tx.size();
@@ -647,4 +697,16 @@ void ecall_test_func(void)
     // printf("msg.type: %d\n", reply_msg.type);
     // printf("msg.channel_id: %d\n", reply_msg.channel_id);
     // printf("msg.amount: %d\n", reply_msg.amount);
+
+    unsigned char signature[65] = {0, };
+    unsigned char *seckey = ::arr_to_bytes((unsigned char*)"e113ff405699b7779fbe278ee237f2988b1e6769d586d8803860d49f28359fbd", 64);
+    unsigned char *pubaddr = ::arr_to_bytes((unsigned char*)"d03a2cc08755ec7d75887f0997195654b928893e", 40);
+
+    sign_message((unsigned char*)"FUCKYOU", 7, seckey, signature);
+
+    for(int i = 0; i < 65; i++)
+        printf("%02x", signature[i]);
+    printf("\n");
+
+    verify_message(0, signature, (unsigned char*)"FUCKYOU", 7, pubaddr);
 }

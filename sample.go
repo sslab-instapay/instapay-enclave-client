@@ -9,10 +9,10 @@ package main
 import "C"
 
 import (
-	// "fmt"
+	//"fmt"
 	// "log"
-	// "unsafe"
-	// "reflect"
+	//"unsafe"
+	//"reflect"
 	// "context"
 	// "github.com/ethereum/go-ethereum/common"
 	// "github.com/ethereum/go-ethereum/ethclient"
@@ -151,7 +151,7 @@ func main() {
 	// 	received update request
 	// */
 	// C.ecall_go_post_update_w(payment_num, &channel_ids[0], &amount[0], size);
-
+ 
 	// fmt.Printf("[POST-UPDATE] CHANNEL 2 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(2)))
 	// fmt.Printf("[POST-UPDATE] CHANNEL 3 BALANCE: %d\n", C.ecall_get_balance_w(C.uint(3)))
 	// fmt.Println()
@@ -209,28 +209,30 @@ func main() {
 	storing sealed secret key to file
 	*/
 
-	// C.ecall_store_account_data_w()
+	// f := C.CString("./data/key/k1")
+	// C.ecall_store_account_data_w(f)
 
 
 	/*
 	loading sealed secret key from file
 	*/
 
-	//C.ecall_load_account_data_w()
+	// C.ecall_load_account_data_w(f)
 
 
 	/*
 	storing sealed channel data to file
 	*/
 
-	// C.ecall_store_channel_data_w()
+	f := C.CString("./data/channel/c2")
+	C.ecall_store_channel_data_w(f)
 
 
 	/*
 	loading sealed channel data from file
 	*/
 
-	// C.ecall_load_channel_data_w()
+	C.ecall_load_channel_data_w(f)
 
 
 	/*
@@ -347,16 +349,43 @@ func main() {
 	/*
 	direct payment  ( Alice ----> Bob )
 	*/
-	C.ecall_test_func_w()
+	// C.ecall_load_account_data_w()
+	// C.ecall_load_channel_data_w()
+	// // C.ecall_test_func_w()
 
-	var original_msg *C.uchar
-	var signature *C.uchar
+	// var originalMsg *C.uchar
+	// var signature *C.uchar
 
-	C.ecall_pay_w(8, 10, &original_msg, &signature)   // Alice calls it
+	// C.ecall_pay_w(8, 10, &originalMsg, &signature)   // Alice calls it
 
-	var reply_msg *C.uchar
-	var reply_sig *C.uchar
+	// // char* S1 = reinterpret_cast<char*>(digest); 바꿔야 하나?
+	// hdr9 := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(originalMsg)),
+	// 	Len:  int(44),
+	// 	Cap:  int(44),
+	// }
+	// s9 := *(*[]C.uchar)(unsafe.Pointer(&hdr9))
+	// fmt.Println()
+	// hdr10 := reflect.SliceHeader{
+	// 	Data: uintptr(unsafe.Pointer(signature)),
+	// 	Len:  int(65),
+	// 	Cap:  int(65),
+	// }
+	// s10 := *(*[]C.uchar)(unsafe.Pointer(&hdr10))
+	// originalMsgStr := fmt.Sprintf("%02x", s9)
+	// signatureMsgStr := fmt.Sprintf("%02x", s10)
+	
+	// convertedOriginalMsg := &([]C.uchar(originalMsgStr)[0])
+	// convertedSignatureMsg := &([]C.uchar(signatureMsgStr)[0])
+	// fmt.Println(originalMsgStr)
+	// fmt.Println(signatureMsgStr)
+	// fmt.Println(convertedOriginalMsg)
+	// fmt.Println(convertedSignatureMsg)
 
-	C.ecall_paid_w(original_msg, signature, &reply_msg, &reply_sig)   // Bob calls it
-	C.ecall_pay_accepted_w(reply_msg, reply_sig)   // Alice calls it
+	// var reply_msg *C.uchar
+	// var reply_sig *C.uchar
+
+	// C.ecall_paid_w(convertedOriginalMsg, convertedSignatureMsg, &reply_msg, &reply_sig)   // Bob calls it
+	// convertedAddress = fmt.Sprintf("%02x", paddrSlice[0].addr)
+	// C.ecall_pay_accepted_w(reply_msg, reply_sig)   // Alice calls it
 }

@@ -5,28 +5,28 @@
 #include <string.h>
 
 
-void ecall_store_account_data_w()
+void ecall_store_account_data_w(char *keyfile)
 {
-    ecall_store_account_data(global_eid);
+    ecall_store_account_data(global_eid, keyfile);
 }
 
 
-void ocall_remove_key_file()
+void ocall_remove_key_file(char *keyfile)
 {
-    if(remove("./data/key/a0") != 0)
+    if(remove(keyfile) != 0)
         printf("error deleting file\n");
     else
         printf("removed file successfully\n");
 }
 
 
-void ocall_store_sealed_seckey(unsigned char *sealed_seckey)
+void ocall_store_sealed_seckey(char *keyfile, unsigned char *sealed_seckey)
 {
-    FILE *fp = fopen("./data/key/a0", "ab");
+    FILE *fp = fopen(keyfile, "ab");
     int count;
 
     count = fwrite(sealed_seckey, sizeof(unsigned char), 592, fp);
-    printf("write %d bytes to ./data/key/a0\n", count);
+    printf("write %d bytes to %s\n", count, keyfile);
 
     fclose(fp);
 
@@ -34,28 +34,28 @@ void ocall_store_sealed_seckey(unsigned char *sealed_seckey)
 }
 
 
-void ecall_store_channel_data_w()
+void ecall_store_channel_data_w(char *chfile)
 {
-    ecall_store_channel_data(global_eid);
+    ecall_store_channel_data(global_eid, chfile);
 }
 
 
-void ocall_remove_channel_file()
+void ocall_remove_channel_file(char *chfile)
 {
-    if(remove("./data/channel/c0") != 0)
+    if(remove(chfile) != 0)
         printf("error deleting file\n");
     else
         printf("removed file successfully\n");
 }
 
 
-void ocall_store_sealed_channel_data(unsigned char *sealed_channel_data)
+void ocall_store_sealed_channel_data(char *chfile, unsigned char *sealed_channel_data)
 {
-    FILE *fp = fopen("./data/channel/c0", "ab");
+    FILE *fp = fopen(chfile, "ab");
     int count;
 
     count = fwrite(sealed_channel_data, sizeof(unsigned char), 628, fp);
-    printf("write %d bytes to ./data/channel/c0\n", count);
+    printf("write %d bytes to %s\n", count, chfile);
 
     fclose(fp);
 

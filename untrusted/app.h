@@ -92,6 +92,8 @@ void ecall_paid_w(unsigned char *msg, unsigned char *signature, unsigned char **
 void ecall_pay_accepted_w(unsigned char *msg, unsigned char *signature);
 
 int ecall_get_balance_w(unsigned int channel_id);
+void* ecall_get_channel_info_w(unsigned int channel_id);
+
 unsigned char* ecall_close_channel_w(unsigned int nonce, unsigned int channel_id, unsigned int *sig_len);
 unsigned char* ecall_eject_w(unsigned int nonce, unsigned int pn, unsigned int *sig_len);
 
@@ -138,12 +140,12 @@ void ecall_receive_create_channel_w(unsigned int channel_id, unsigned char *owne
 void ecall_receive_close_channel_w(unsigned int channel_id, unsigned int owner_bal, unsigned int receiver_bal);
 
 /* store.cpp */
-void ecall_store_account_data_w(void);
-void ecall_store_channel_data_w(void);
+void ecall_store_account_data_w(char *keyfile);
+void ecall_store_channel_data_w(char *chfile);
 
 /* load.cpp */
-void ecall_load_account_data_w(void);
-void ecall_load_channel_data_w(void);
+void ecall_load_account_data_w(char *keyfile);
+void ecall_load_channel_data_w(char *chfile);
 
 
 #if defined(__cplusplus)

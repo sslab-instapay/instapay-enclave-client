@@ -5,11 +5,13 @@
 #include <string.h>
 
 
-void ecall_load_account_data_w()
+void ecall_load_account_data_w(char *keyfile)
 {
-    FILE *fp = fopen("./data/key/a0", "rb");   // sealed log size = 592
+    FILE *fp = fopen(keyfile, "rb");   // sealed log size = 592
     unsigned char sealed_seckey[600];
     int count;
+
+    if(fp == NULL) return;
 
     while(1) {
         count = fread(sealed_seckey, sizeof(unsigned char), 592, fp);
@@ -22,11 +24,13 @@ void ecall_load_account_data_w()
 }
 
 
-void ecall_load_channel_data_w()
+void ecall_load_channel_data_w(char *chfile)
 {
-    FILE *fp = fopen("./data/channel/c0", "rb");   // sealed log size = 628
+    FILE *fp = fopen(chfile, "rb");   // sealed log size = 628
     unsigned char sealed_channel_data[700];
     int count;
+
+    if(fp == NULL) return;
 
     while(1) {
         count = fread(sealed_channel_data, sizeof(unsigned char), 628, fp);

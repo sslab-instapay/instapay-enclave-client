@@ -35,6 +35,7 @@ unsigned char* ecall_create_channel_w(unsigned int nonce, unsigned char *owner, 
     return signed_tx;
 }
 
+
 unsigned char* ecall_onchain_payment_w(unsigned int nonce, unsigned char *owner, unsigned char *receiver, unsigned int amount, unsigned int *sig_len)
 {
     unsigned char *signed_tx = new unsigned char[700];
@@ -45,6 +46,7 @@ unsigned char* ecall_onchain_payment_w(unsigned int nonce, unsigned char *owner,
     
     return signed_tx;
 }
+
 
 unsigned int ecall_pay_w(unsigned int channel_id, unsigned int amount, unsigned char **original_msg, unsigned char **output)
 {
@@ -62,6 +64,7 @@ unsigned int ecall_pay_w(unsigned int channel_id, unsigned int amount, unsigned 
     return is_success;
 }
 
+
 void ecall_paid_w(unsigned char *msg, unsigned char *signature, unsigned char **original_msg, unsigned char **output)
 {
     unsigned char *reply_msg = new unsigned char[sizeof(message)];
@@ -74,10 +77,12 @@ void ecall_paid_w(unsigned char *msg, unsigned char *signature, unsigned char **
     *output = reply_sig;
 }
 
+
 void ecall_pay_accepted_w(unsigned char *msg, unsigned char *signature)
 {
     ecall_pay_accepted(global_eid, msg, signature);
 }
+
 
 int ecall_get_balance_w(unsigned int channel_id)
 {
@@ -86,6 +91,16 @@ int ecall_get_balance_w(unsigned int channel_id)
     ecall_get_balance(global_eid, channel_id, &balance);
 
     return balance;
+}
+
+
+void* ecall_get_channel_info_w(unsigned int channel_id)
+{
+    unsigned char *channel_info = new unsigned char[sizeof(channel)];
+
+    ecall_get_channel_info(global_eid, channel_id, channel_info);
+
+    return channel_info;
 }
 
 
