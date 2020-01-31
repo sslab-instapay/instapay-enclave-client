@@ -124,6 +124,11 @@ void ecall_go_post_update(unsigned char *msg, unsigned char *signature, unsigned
     channel_ids = ud_req->channel_ids;
     payment_amount = ud_req->payment_amount;
 
+    printf("channel ids: ");
+    for(int i = 0; i < payment_size; i++)
+        printf("[%d] ", channel_ids[i]);
+    printf("\n");    
+
     unsigned int value;
 
     if(payments.find(payment_num) == payments.end()) {
