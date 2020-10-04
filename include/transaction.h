@@ -29,9 +29,9 @@ class Transaction {
                     )
                     : m_nonce(t_nonce)
                     , m_gas_price(20000000000)   // 2000000000, 20000000000
-                    , m_gas_limit(200000)  // 2000000
+                    , m_gas_limit(2000000)  // 2000000
                     , m_value(t_value)
-                    , m_v(8888)
+                    , m_v(11)
                     , m_data_size(t_data_size)
         {
             m_to = ::arr_to_bytes(t_to, 40);
