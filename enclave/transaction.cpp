@@ -61,7 +61,7 @@ void Transaction::sign(unsigned char *seckey_arr)
     secp256k1_context* secp256k1_ctx = NULL;
     secp256k1_ecdsa_signature sig;
 
-    unsigned char *seckey = ::arr_to_bytes(seckey_arr, 64);
+    // unsigned char *seckey = ::arr_to_bytes(seckey_arr, 64);
     unsigned char output64[64];
 
     /* sha3 (keccak256) */
@@ -75,7 +75,7 @@ void Transaction::sign(unsigned char *seckey_arr)
 
     /* ECDSA sign on the message */
     secp256k1_ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
-    secp256k1_ecdsa_sign(secp256k1_ctx, &sig, msg32, seckey, NULL, NULL);
+    secp256k1_ecdsa_sign(secp256k1_ctx, &sig, msg32, seckey_arr, NULL, NULL);
     secp256k1_ecdsa_signature_serialize_compact(secp256k1_ctx, output64, &sig);
 
     m_v = m_v * 2 + 36;         // 잘 안되면 35로 바꿔볼 것. 그리고 잘 안되면 또 다시 36으로 변경
