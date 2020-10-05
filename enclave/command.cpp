@@ -98,8 +98,17 @@ void ecall_create_channel(unsigned int nonce, unsigned char *owner, unsigned cha
     sha3_Update(&sha3_ctx, func, strlen((char*)func));
     msg32 = (unsigned char*)sha3_Finalize(&sha3_ctx);
     unsigned char *addr = ::arr_to_bytes(receiver, 40);
+    // Empty Data insert
     data.insert(data.end(), msg32, msg32 + 4);
+    for(int i = 0; i < 12; i++){
+        data.insert(data.end(), 0);
+    }
     data.insert(data.end(), addr, addr + 20);
+    printf("\n");
+    printf("txdata : ");
+    for(int i = 0; i < data.size(); i++){
+        printf("%02x", data[i]);
+    }
 
     // deposit *= 1000000000000000000;
 
