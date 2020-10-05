@@ -8,25 +8,8 @@ package main
 */
 import "C"
 
-import(
-	"fmt"
-)
-
-func main(){
-
-	channelIds := make([]int, 10)
-	amounts := make([]int, 10)
-	var channelSlice []C.uint
-
-	for i := range channelIds{
-		channelSlice = append(channelSlice, C.uint(i))
-	}
-
-	var amountSlice []C.int
-
-	for i := range amounts{
-		amountSlice = append(amountSlice, C.int(i))
-	}
-	fmt.Println(len(amounts))
-	fmt.Println(len(channelSlice))
+func main() {
+	C.initialize_enclave()
+	cf := C.CString("745a8d1610D4AC940350221F569338E4C93b1De6")
+	C.ecall_load_contract_address_w(cf)
 }

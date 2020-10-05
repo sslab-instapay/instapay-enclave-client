@@ -97,7 +97,6 @@ void ecall_create_channel(unsigned int nonce, unsigned char *owner, unsigned cha
     sha3_SetFlags(&sha3_ctx, SHA3_FLAGS_KECCAK);
     sha3_Update(&sha3_ctx, func, strlen((char*)func));
     msg32 = (unsigned char*)sha3_Finalize(&sha3_ctx);
-
     unsigned char *addr = ::arr_to_bytes(receiver, 40);
     data.insert(data.end(), msg32, msg32 + 4);
     data.insert(data.end(), addr, addr + 20);
